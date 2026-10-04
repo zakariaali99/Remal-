@@ -1,0 +1,4 @@
+# only contact.php is reachable; config and anything else in /api are blocked
+<FilesMatch "^(?!contact\.php$).*$">
+  Require all denied
+</FilesMatch>
