@@ -1,6 +1,7 @@
 import { renderToString } from 'react-dom/server'
 import App from './App'
 import { FONT_URL, LANGS, LANG_CODES, type Lang } from './i18n'
+import { DICTS } from './i18n/all'
 import { MARK_SVG_STRING } from './lib/brand'
 
 export { LANG_CODES }
@@ -8,8 +9,9 @@ export { LANG_CODES }
 export const SITE = 'https://remalperfumes.ly' // update if the final domain differs
 
 export function render(lang: Lang) {
-  const { dict, dir, path } = LANGS[lang]
-  const html = renderToString(<App lang={lang} />)
+  const { dir, path } = LANGS[lang]
+  const dict = DICTS[lang]
+  const html = renderToString(<App lang={lang} dict={dict} />)
   const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
   const alternates = LANG_CODES.map((c) => `<link rel="alternate" hreflang="${c}" href="${SITE}${LANGS[c].path}">`).join('\n')
   const head = `<title>${esc(dict['meta.title'])}</title>
@@ -29,5 +31,7 @@ ${alternates}
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${encodeURIComponent(MARK_SVG_STRING)}">
 <link rel="stylesheet" href="${FONT_URL[lang]}">`
-  return { html, head, lang, dir }
+  // the page's own dictionary, embedded for hydration (escaped so it can't close the script tag)
+  const dictJson = JSON.stringify(dict).replace(/</g, '\\u003c')
+  return { html, head, lang, dir, dictJson }
 }

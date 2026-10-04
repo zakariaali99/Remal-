@@ -10,11 +10,12 @@ const { render, LANG_CODES, SITE } = await import(pathToFileURL(path.join(root, 
 
 const urls = []
 for (const lang of LANG_CODES) {
-  const { html, head, dir } = render(lang)
+  const { html, head, dir, dictJson } = render(lang)
   const page = template
     .replace('<html lang="ar" dir="rtl">', `<html lang="${lang}" dir="${dir}">`)
-    .replace('<!--head-->', head)
-    .replace('<!--app-->', html)
+    .replace('<!--head-->', () => head)
+    .replace('<!--app-->', () => html)
+    .replace('<!--dict-->', () => `<script id="__dict" type="application/json">${dictJson}</script>`)
   const out = lang === 'ar' ? dist : path.join(dist, lang)
   fs.mkdirSync(out, { recursive: true })
   fs.writeFileSync(path.join(out, 'index.html'), page)

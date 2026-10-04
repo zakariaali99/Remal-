@@ -3,8 +3,12 @@ import { LANGS, LANG_CODES, type Lang } from '../i18n'
 import { Globe } from './ui'
 
 // Switching language should not replay the intro; a plain refresh should.
-export const markLangSwitch = () => {
-  try { sessionStorage.setItem('remal-skip-intro-once', '1') } catch { /* storage blocked: intro just plays */ }
+// An explicit choice is remembered, so it wins over the device language from then on.
+export const markLangSwitch = (e: { currentTarget: HTMLAnchorElement }) => {
+  try {
+    sessionStorage.setItem('remal-skip-intro-once', '1')
+    localStorage.setItem('remal-lang', e.currentTarget.lang)
+  } catch { /* storage blocked: device language keeps deciding */ }
 }
 
 export function LangMenu({ lang, label }: { lang: Lang; label: string }) {

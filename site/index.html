@@ -7,6 +7,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>
+  // Device language: on a visitor's first arrival, send them to the page in their device's language
+  // (ar, en, fr, zh, ja; anything else falls back to English). A language picked from the menu is
+  // remembered and always wins. Search-engine bots and ?stay are never redirected.
+  (function(){try{
+    var P={ar:'/',en:'/en/',fr:'/fr/',zh:'/zh/',ja:'/ja/'},here=document.documentElement.lang,q=new URLSearchParams(location.search);
+    if(q.has('stay')||/bot|crawl|spider|slurp|facebookexternalhit|whatsapp/i.test(navigator.userAgent))return;
+    var want=localStorage.getItem('remal-lang');
+    if(!P[want]){want='en';var L=navigator.languages||[navigator.language];
+      for(var i=0;i<L.length;i++){var c=String(L[i]||'').slice(0,2).toLowerCase();if(P[c]){want=c;break}}}
+    if(want!==here){location.replace(P[want]+location.search+location.hash);document.documentElement.style.visibility='hidden'}
+  }catch(e){}})();
   // intro plays on every load; skipped only for reduced motion, ?nointro (QA), or right after a language switch
   (function(){var q=new URLSearchParams(location.search),once=false;
   try{once=sessionStorage.getItem('remal-skip-intro-once')==='1';sessionStorage.removeItem('remal-skip-intro-once')}catch(e){}
@@ -16,6 +27,7 @@
 </head>
 <body>
 <div id="root"><!--app--></div>
+<!--dict-->
 <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

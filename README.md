@@ -34,7 +34,10 @@ npm run dev        # http://localhost:5173 (the form is stubbed locally because 
 npm run build      # outputs site/dist (all 5 languages + sitemap.xml)
 npm run typecheck
 ```
-QA URL flags: `?nointro` skips the opening animation. The opening plays on every page load. It is skipped only after a language switch, or when the visitor's device asks for reduced motion.
+QA URL flags: `?nointro` skips the opening animation. `?stay` disables the language redirect.
+- **Opening:** plays on every page load, with no skip button. It is skipped only right after a language switch, or when the visitor's device asks for reduced motion.
+- **Language:** on arrival, visitors are sent to the page in their device language (ar/en/fr/zh/ja; any other language goes to English). A language picked from the globe menu is remembered (`localStorage`) and always wins. Search bots and link-preview crawlers are never redirected.
+- **Weight:** the JS bundle carries no text. Each pre-rendered page embeds only its own dictionary (`<script id="__dict">`).
 
 ## Deploy to Libyan Spider (cPanel)
 1. **Domain:** register `remalperfumes.ly` with Libyan Spider (it was available on 2026-09-29) and point it to the hosting package.

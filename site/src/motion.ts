@@ -235,10 +235,7 @@ function runIntro(lang: Lang) {
       .to('#iword path', { opacity: 1, duration: 0.7, stagger: { each: 0.06 }, ease: 'power2.out' }, '-=.2')
       .from('#iword path', { y: 12, duration: 0.9, stagger: 0.06, ease: 'power3.out' }, '<')
       .to('#intro .ital', { opacity: 1, duration: 0.6 }, '-=.5')
-      .to('#count,#skip', { opacity: 0, duration: 0.4 }, '-=.4')
+      .to('#count', { opacity: 0, duration: 0.4 }, '-=.4')
       .add(exit, '+=.35')
-    const skip = $('#skip')
-    skip.tabIndex = 0
-    skip.onclick = () => { tl.kill(); done() }
   })
 }

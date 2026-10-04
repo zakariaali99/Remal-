@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { LANGS, makeT, type Lang } from './i18n'
+import { LANGS, makeT, type Dict, type Lang } from './i18n'
 import { Mark, Wordmark } from './lib/brand'
 import { GRID_X, GRID_Y, MAP_H, MAP_W, MISRATA, OUTLINE_POINTS } from './lib/libya'
 import { LangList, LangMenu } from './components/LangMenu'
@@ -10,9 +10,8 @@ import { initMotion, lenisStop, lenisStart } from './motion'
 const NAV = [['#about', 'nav.about'], ['#brands', 'nav.brands'], ['#portfolio', 'nav.portfolio'], ['#network', 'nav.network'], ['#partner', 'nav.partner'], ['#contact', 'nav.contact']] as const
 const FACEBOOK = 'https://www.facebook.com/share/1CmyoEmRdq/'
 
-export default function App({ lang }: { lang: Lang }) {
-  const t = makeT(lang)
-  const dict = LANGS[lang].dict
+export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
+  const t = makeT(dict)
   const [drawer, setDrawer] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
   const burgerRef = useRef<HTMLButtonElement>(null)
@@ -49,7 +48,6 @@ export default function App({ lang }: { lang: Lang }) {
           <div className="ital">{t('intro.tag')}</div>
         </div>
         <div className="count" id="count">00</div>
-        <button className="skip" id="skip" tabIndex={-1}>{t('intro.skip')}</button>
       </div>
 
       <div className="cur" id="cur" />
