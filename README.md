@@ -39,7 +39,18 @@ QA URL flags: `?nointro` skips the opening animation. `?stay` disables the langu
 - **Language:** on arrival, visitors are sent to the page in their device language (ar/en/fr/zh/ja; any other language goes to English). A language picked from the globe menu is remembered (`localStorage`) and always wins. Search bots and link-preview crawlers are never redirected.
 - **Weight:** the JS bundle carries no text. Each pre-rendered page embeds only its own dictionary (`<script id="__dict">`).
 
-## Deploy: GitHub Actions → Libyan Spider (automatic)
+## Deploy (current method): git pull on the server
+The server can't build (no Node), so the ready-built site lives on the **`production`** branch:
+- **On the Mac:** run `./scripts/publish.sh`. It builds, checks, and pushes `site/dist` (plus `update.sh` and `.cpanel.yml`) to `production`.
+- **On the server, first time (cPanel Terminal):**
+  ```bash
+  cd ~ && git clone -b production https://github.com/zakariaali99/Remal-.git remal-site && ~/remal-site/update.sh
+  cp ~/public_html/api/config.example.php ~/public_html/api/config.php
+  ```
+- **Every update:** run `~/remal-site/update.sh`. It pulls and copies into `~/public_html`, never touching `api/config.php`, `.well-known/` or `cgi-bin/`.
+  You can also use cPanel → *Git Version Control* → *Deploy HEAD Commit*, which runs `.cpanel.yml`.
+
+## Alternative: automatic deploys (GitHub Actions / FTPS)
 Every push to `main` builds the site on GitHub (`.github/workflows/deploy.yml`) and syncs `site/dist/` into
 `/home/remalper/public_html` over SSH with rsync. No Node or React server is needed on the host: the output is
 plain HTML/CSS/JS, and the only server code is `api/contact.php`, which runs on cPanel's PHP.
