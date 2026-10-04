@@ -9,6 +9,9 @@ import { initMotion, lenisStop, lenisStart } from './motion'
 
 const NAV = [['#about', 'nav.about'], ['#brands', 'nav.brands'], ['#portfolio', 'nav.portfolio'], ['#network', 'nav.network'], ['#partner', 'nav.partner'], ['#contact', 'nav.contact']] as const
 const FACEBOOK = 'https://www.facebook.com/share/1CmyoEmRdq/'
+const PHONE_TEL = '+218915096111'
+const PHONE_SHOW = '+218 91 509 6111'
+const EMAIL = 'info@remalperfumes.ly'
 
 export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
   const t = makeT(dict)
@@ -226,7 +229,14 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
           <div className="ft-top">
             <div className="ft-brand"><p>{t('ft.line')}</p></div>
             <div><h4>{t('ft.co')}</h4>{NAV.slice(0, 4).map(([href, k]) => <a key={href} href={href}>{t(k)}</a>)}</div>
-            <div><h4>{t('ft.contact')}</h4><ul><li>{t('ft.addr')}</li></ul><a href="#partner">{t('ft.form')}</a></div>
+            <div>
+              <h4>{t('ft.contact')}</h4>
+              <ul><li>{t('ft.addr')}</li></ul>
+              <span className="ft-lbl">{t('ft.support')}</span>
+              <a href={`tel:${PHONE_TEL}`} dir="ltr" className="ft-ltr">{PHONE_SHOW}</a>
+              <a href={`mailto:${EMAIL}`} dir="ltr" className="ft-ltr">{EMAIL}</a>
+              <a href="#partner">{t('ft.form')}</a>
+            </div>
             <div><h4>{t('ft.follow')}</h4><a href={FACEBOOK} target="_blank" rel="noopener">{t('ft.fb')}</a></div>
           </div>
           <div className="ft-word" aria-hidden="true"><Wordmark /></div>

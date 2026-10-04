@@ -321,3 +321,6 @@ html[lang=fr] .menu{letter-spacing:.06em;gap:clamp(14px,1.6vw,26px)}
 html[lang=fr] .nav .btn{letter-spacing:.08em;padding:13px 18px}
 /* CJK: break at phrase boundaries so particles never sit alone on a line */
 html[lang=ja] h1,html[lang=ja] h2,html[lang=zh] h1,html[lang=zh] h2{word-break:auto-phrase;text-wrap:balance}
+
+.ft-top .ft-lbl{display:block;font-size:12px;color:var(--copper-l);margin:14px 0 4px}
+.ft-top a.ft-ltr{unicode-bidi:isolate;text-align:start}
