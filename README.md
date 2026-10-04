@@ -69,6 +69,8 @@ plain HTML/CSS/JS, and the only server code is `api/contact.php`, which runs on 
    Deploys never overwrite or delete `api/config.php` or `.well-known/`.
 6. Push to `main` (or Actions → *Build & deploy* → *Run workflow*), open the site, and send one test enquiry.
 
+**Deploy from the Mac instead** (no GitHub Actions needed): create `.deploy.env` with `SSH_HOST`, `SSH_PORT` and `SSH_USER=remalper`, then run `./deploy.sh`.
+
 Without secrets, each run still builds the site and attaches it as an artifact (`remal-site-<sha>`) for manual upload through File Manager.
 
 If the final domain is not `remalperfumes.ly`, update `SITE` in `site/src/entry-server.tsx` (it's used for canonical, hreflang, og and the sitemap) and `public/robots.txt`, then rebuild.
