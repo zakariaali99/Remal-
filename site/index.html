@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--head-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script>
+  // intro plays on every load; skipped only for reduced motion, ?nointro (QA), or right after a language switch
+  (function(){var q=new URLSearchParams(location.search),once=false;
+  try{once=sessionStorage.getItem('remal-skip-intro-once')==='1';sessionStorage.removeItem('remal-skip-intro-once')}catch(e){}
+  if(once||q.has('nointro')||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('no-intro');
+  document.documentElement.classList.add('js');})();
+</script>
+</head>
+<body>
+<div id="root"><!--app--></div>
+<script type="module" src="/src/main.tsx"></script>
+</body>
+</html>
