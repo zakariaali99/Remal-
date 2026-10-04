@@ -5,3 +5,4 @@ site/public/api/config.php
 *.zip
 .DS_Store
 .deploy.env
+.production/

@@ -1,0 +1,7 @@
+---
+# cPanel → Git Version Control → "Deploy HEAD Commit" runs these (same as update.sh).
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/remalper/public_html/
+    - /bin/rm -rf $DEPLOYPATH/assets
+    - /bin/cp -R assets img en fr zh ja api index.html og.jpg robots.txt sitemap.xml .htaccess $DEPLOYPATH
