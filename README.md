@@ -39,14 +39,37 @@ QA URL flags: `?nointro` skips the opening animation. `?stay` disables the langu
 - **Language:** on arrival, visitors are sent to the page in their device language (ar/en/fr/zh/ja; any other language goes to English). A language picked from the globe menu is remembered (`localStorage`) and always wins. Search bots and link-preview crawlers are never redirected.
 - **Weight:** the JS bundle carries no text. Each pre-rendered page embeds only its own dictionary (`<script id="__dict">`).
 
-## Deploy to Libyan Spider (cPanel)
-1. **Domain:** register `remalperfumes.ly` with Libyan Spider (it was available on 2026-09-29) and point it to the hosting package.
-2. **SSL:** cPanel → *SSL/TLS Status* → run AutoSSL. `.htaccess` forces HTTPS, so do this before uploading.
-3. **Email:** cPanel → *Email Accounts* → create `info@remalperfumes.ly`, the inbox that receives enquiries, and `no-reply@remalperfumes.ly`, the sender.
-4. **Upload:** run `npm run build`, then upload the **contents** of `site/dist/` into `public_html/`. Use cPanel *File Manager → Upload*, then *Extract* the zip. Make sure hidden files (`.htaccess`) are included.
-5. **Form config:** in `public_html/api/`, copy `config.example.php` to `config.php` and fill in the `to` and `from` addresses and the `leads_csv` path (`/home/<cpanel-user>/remal-leads.csv`, outside `public_html`).
-6. **PHP version:** cPanel → *MultiPHP Manager* → PHP 8.1 or newer.
-7. **Test:** open the site, submit the form once, and check that the email arrived and that `remal-leads.csv` got a row.
+## Deploy: GitHub Actions → Libyan Spider (automatic)
+Every push to `main` builds the site on GitHub (`.github/workflows/deploy.yml`) and syncs `site/dist/` into
+`/home/remalper/public_html` over SSH with rsync. No Node or React server is needed on the host: the output is
+plain HTML/CSS/JS, and the only server code is `api/contact.php`, which runs on cPanel's PHP.
+
+### One-time setup
+1. **Server: authorise the deploy key.** In the cPanel Terminal (user `remalper`):
+   ```bash
+   mkdir -p ~/.ssh && chmod 700 ~/.ssh
+   echo "<contents of ~/.ssh/remal_github_deploy.pub on Zakaria's Mac>" >> ~/.ssh/authorized_keys
+   chmod 600 ~/.ssh/authorized_keys
+   which rsync && hostname
+   ```
+2. **SSH details:** ask Libyan Spider (or check cPanel → *SSH Access*) for the SSH **hostname** and **port**, and make sure external SSH is enabled for the account.
+3. **GitHub secrets** (repo → Settings → Secrets and variables → Actions → *New repository secret*):
+   | Secret | Value |
+   |---|---|
+   | `SSH_HOST` | server hostname, e.g. `ls55.…` |
+   | `SSH_PORT` | the SSH port |
+   | `SSH_USER` | `remalper` |
+   | `SSH_KEY` | the **private** key: run `pbcopy < ~/.ssh/remal_github_deploy` on the Mac, then paste |
+   No SSH? Set `FTP_SERVER`, `FTP_USERNAME` and `FTP_PASSWORD` instead (an FTP account rooted at `public_html`). The workflow falls back to FTP.
+4. **cPanel once:** run AutoSSL (SSL/TLS Status), create `info@` and `no-reply@remalperfumes.ly` (Email Accounts), set PHP 8.1+ (MultiPHP Manager).
+5. **Form config on the server, once:**
+   ```bash
+   cp ~/public_html/api/config.example.php ~/public_html/api/config.php
+   ```
+   Deploys never overwrite or delete `api/config.php` or `.well-known/`.
+6. Push to `main` (or Actions → *Build & deploy* → *Run workflow*), open the site, and send one test enquiry.
+
+Without secrets, each run still builds the site and attaches it as an artifact (`remal-site-<sha>`) for manual upload through File Manager.
 
 If the final domain is not `remalperfumes.ly`, update `SITE` in `site/src/entry-server.tsx` (it's used for canonical, hreflang, og and the sitemap) and `public/robots.txt`, then rebuild.
 

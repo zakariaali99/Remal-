@@ -1,0 +1,104 @@
+# Build the REMAL site and deploy it to Libyan Spider (cPanel account "remalper").
+# Runs on every push to main, or manually from the Actions tab ("Run workflow").
+#
+# Preferred: SSH + rsync. Set these in GitHub → Settings → Secrets and variables → Actions → Secrets:
+#   SSH_HOST   the server hostname (e.g. ls55.<libyan-spider-host> or remalperfumes.ly)
+#   SSH_PORT   SSH port given by Libyan Spider (often not 22)
+#   SSH_USER   remalper
+#   SSH_KEY    the PRIVATE deploy key (its public half is in ~/.ssh/authorized_keys on the server)
+# Fallback: FTP (only used when SSH_HOST is not set): FTP_SERVER, FTP_USERNAME, FTP_PASSWORD
+# With no secrets at all, the site is still built and attached to the run as a downloadable artifact.
+
+name: Build & deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build (5 pre-rendered languages)
+        run: npm run build
+
+      - name: Sanity check the output
+        run: |
+          for f in index.html en/index.html fr/index.html zh/index.html ja/index.html api/contact.php .htaccess; do
+            test -f "dist/$f" || { echo "missing dist/$f"; exit 1; }
+          done
+          grep -q '__dict' dist/index.html
+
+      - name: Keep the build as a downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: remal-site-${{ github.sha }}
+          path: site/dist
+          include-hidden-files: true
+          retention-days: 30
+
+      # ---------- SSH + rsync (preferred) ----------
+      - name: Deploy over SSH to ~/public_html
+        if: env.SSH_HOST != ''
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          # --delete keeps public_html identical to the build, EXCEPT the server-only files listed below
+          # (form config, Let's Encrypt/AutoSSL challenges, cPanel defaults).
+          rsync -az --delete \
+            --exclude 'api/config.php' \
+            --exclude '.well-known/' \
+            --exclude 'cgi-bin/' \
+            --exclude '.ftp-deploy-sync-state.json' \
+            -e "ssh -i ~/.ssh/deploy_key -p $SSH_PORT" \
+            dist/ "$SSH_USER@$SSH_HOST:public_html/"
+          echo "::notice::Deployed $(git rev-parse --short HEAD) to $SSH_HOST:~/public_html"
+
+      # ---------- FTP (fallback) ----------
+      - name: Deploy over FTP to public_html
+        if: env.SSH_HOST == '' && env.FTP_SERVER != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+          local-dir: ./site/dist/
+          server-dir: ${{ vars.FTP_SERVER_DIR || './' }}
+          exclude: |
+            **/.DS_Store
+            api/config.php
+
+      - name: Deployment skipped
+        if: env.SSH_HOST == '' && env.FTP_SERVER == ''
+        run: echo "::notice::No deploy secrets yet. The site was built, so download it from this run's artifacts."
