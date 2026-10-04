@@ -15,7 +15,11 @@ if [ ! -d "$WT" ]; then
   if git show-ref -q --verify refs/remotes/origin/production; then
     git worktree add -q "$WT" -B production origin/production
   else
-    git worktree add -q --orphan -b production "$WT"
+    # first publish: start the branch from an empty root commit (works on any git version)
+    EMPTY=$(git hash-object -t tree /dev/null)
+    ROOTC=$(git -c user.name="zakaria_ali" -c user.email="zakaria.ali.sweasi@gmail.com" commit-tree "$EMPTY" -m "production branch")
+    git branch -f production "$ROOTC"
+    git worktree add -q "$WT" production
   fi
 fi
 cd "$WT"
