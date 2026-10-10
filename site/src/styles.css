@@ -15,14 +15,16 @@
   --sand:#E8D8C4; --sand-2:#efe4d6; --ivory:#F8F3EC; --line:rgba(38,48,59,.14); --muted:#6b7480;
   --pad:clamp(20px,5vw,72px); --max:1320px; --ease:cubic-bezier(.2,.7,.2,1);
 }
-/* Typography: the device's own system font comes first, so iPhone/iPad/Mac render Apple's SF Pro and SF Arabic
-   (PingFang / Hiragino for Chinese and Japanese) with nothing to download. Other devices fall back to Cairo
-   (Arabic) and Inter (Latin), then to their own system fonts. Apple's fonts can't legally be shipped as web fonts. */
-:root{--num:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif}
-html[lang=ar]{--sys:-apple-system,BlinkMacSystemFont,'SF Arabic','Cairo','Segoe UI','Noto Sans Arabic',Tahoma,sans-serif;--track:0;--label-size:14px;--hw:300;--lh:1.3}
-html[lang=en],html[lang=fr]{--sys:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--track:.16em;--label-size:12px;--hw:300;--lh:1.06}
-html[lang=zh]{--sys:-apple-system,BlinkMacSystemFont,'PingFang SC','Inter','Microsoft YaHei','Noto Sans SC','Noto Sans CJK SC',sans-serif;--track:.1em;--label-size:13px;--hw:300;--lh:1.3}
-html[lang=ja]{--sys:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Inter','Yu Gothic','Noto Sans JP','Noto Sans CJK JP',sans-serif;--track:.1em;--label-size:13px;--hw:300;--lh:1.3}
+/* Typography. Apple devices (html.apple, set before first paint in index.html) use the system font: SF Pro and
+   SF Arabic, PingFang / Hiragino for Chinese and Japanese, with nothing downloaded. Every other device gets the
+   closest free match: Vazirmatn for Arabic (picked by side-by-side comparison with SF Arabic; its Latin is Inter)
+   and Inter for Latin. Apple's fonts can't legally be shipped as web fonts. */
+:root{--num:'Inter','Segoe UI',Roboto,sans-serif}
+html[lang=ar]{--sys:'Vazirmatn','Segoe UI','Noto Sans Arabic',Tahoma,sans-serif;--track:0;--label-size:14px;--hw:300;--lh:1.3}
+html[lang=en],html[lang=fr]{--sys:'Inter','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--track:.16em;--label-size:12px;--hw:300;--lh:1.06}
+html[lang=zh]{--sys:'Inter','Microsoft YaHei','Noto Sans SC','Noto Sans CJK SC',sans-serif;--track:.1em;--label-size:13px;--hw:300;--lh:1.3}
+html[lang=ja]{--sys:'Inter','Yu Gothic','Noto Sans JP','Noto Sans CJK JP',sans-serif;--track:.1em;--label-size:13px;--hw:300;--lh:1.3}
+html.apple{--sys:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;--num:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
 html{--head:var(--sys);--body:var(--sys);--label:var(--sys)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--ivory);color:var(--ink);font-family:var(--body);font-weight:300;font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}

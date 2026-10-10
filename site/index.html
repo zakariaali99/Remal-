@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>
+  // Apple devices use their own system font (SF Pro / SF Arabic); see styles.css
+  if(/Mac|iPhone|iPad|iPod/.test(navigator.platform||navigator.userAgent))document.documentElement.classList.add('apple');
   // Device language: on a visitor's first arrival, send them to the page in their device's language
   // (ar, en, fr, zh, ja; anything else falls back to English). A language picked from the menu is
   // remembered and always wins. Search-engine bots and ?stay are never redirected.

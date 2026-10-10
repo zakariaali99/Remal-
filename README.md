@@ -78,6 +78,6 @@ If the final domain is not `remalperfumes.ly`, update `SITE` in `site/src/entry-
 ## Open items
 - Client to confirm: positioning (distributor only, or also its own perfume line?), represented brands, official email/phone/WhatsApp, address.
 - Hero image is the client's branded bottle mockup and implies an own-label perfume. Replace it once positioning is confirmed.
-- Typography (client request, 2026-10-10): system font first, so Apple devices show SF Pro / SF Arabic with no download. Other devices fall back to Cairo (Arabic) and Inter (Latin). Chinese and Japanese use the device fonts. Apple's fonts can't be shipped as web fonts. The logo keeps its own lettering.
+- Typography (client request, 2026-10-10): Apple devices use the system font (SF Pro / SF Arabic) with no download. All other devices get the closest free match: **Vazirmatn** for Arabic (chosen by side-by-side comparison with SF Arabic) and **Inter** for Latin. Chinese and Japanese use device fonts. Apple's fonts can't be shipped as web fonts. The logo keeps its own lettering.
 - The French, Chinese and Japanese copy was written by Claude. Have a native speaker review it, especially zh/ja, before promoting those pages.
 - Phase B (after Dubai): admin panel for brands, products, distributors and news (Django API), with records looked up by id.

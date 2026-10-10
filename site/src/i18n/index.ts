@@ -14,15 +14,12 @@ export const LANGS = {
 export type Lang = keyof typeof LANGS
 export const LANG_CODES = Object.keys(LANGS) as Lang[]
 
-// Web fonts are only a fallback for devices without Apple's system fonts (see styles.css):
-// Cairo for Arabic, Inter for Latin. Chinese and Japanese always use the device's own fonts, so nothing is downloaded.
-const INTER = 'family=Inter:wght@200;300;400;500'
+// Web fonts are used only on non-Apple devices (see styles.css): Vazirmatn for Arabic, Inter for Latin.
+// Chinese and Japanese always use the device's own fonts.
+const INTER = 'https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap'
 export const FONT_URL: Record<Lang, string> = {
-  ar: `https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500&${INTER}&display=swap`,
-  en: `https://fonts.googleapis.com/css2?${INTER}&display=swap`,
-  fr: `https://fonts.googleapis.com/css2?${INTER}&display=swap`,
-  zh: `https://fonts.googleapis.com/css2?${INTER}&display=swap`,
-  ja: `https://fonts.googleapis.com/css2?${INTER}&display=swap`,
+  ar: 'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200;300;400;500&display=swap',
+  en: INTER, fr: INTER, zh: INTER, ja: INTER,
 }
 
 export function makeT(dict: Dict) {
