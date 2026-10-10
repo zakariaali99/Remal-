@@ -15,10 +15,15 @@
   --sand:#E8D8C4; --sand-2:#efe4d6; --ivory:#F8F3EC; --line:rgba(38,48,59,.14); --muted:#6b7480;
   --pad:clamp(20px,5vw,72px); --max:1320px; --ease:cubic-bezier(.2,.7,.2,1);
 }
-html[lang=ar]{--head:'Alexandria',sans-serif;--body:'IBM Plex Sans Arabic',sans-serif;--label:'IBM Plex Sans Arabic',sans-serif;--track:0;--label-size:14px;--hw:300;--lh:1.32}
-html[lang=en],html[lang=fr]{--head:'Cormorant Garamond',Georgia,serif;--body:'Jost',system-ui,sans-serif;--label:'Jost',sans-serif;--track:.28em;--label-size:12px;--hw:300;--lh:1.04}
-html[lang=zh]{--head:'Noto Serif SC','Cormorant Garamond',serif;--body:'Noto Sans SC','Jost',sans-serif;--label:'Noto Sans SC','Jost',sans-serif;--track:.12em;--label-size:13px;--hw:300;--lh:1.3}
-html[lang=ja]{--head:'Noto Serif JP','Cormorant Garamond',serif;--body:'Noto Sans JP','Jost',sans-serif;--label:'Noto Sans JP','Jost',sans-serif;--track:.12em;--label-size:13px;--hw:300;--lh:1.3}
+/* Typography: the device's own system font comes first, so iPhone/iPad/Mac render Apple's SF Pro and SF Arabic
+   (PingFang / Hiragino for Chinese and Japanese) with nothing to download. Other devices fall back to Cairo
+   (Arabic) and Inter (Latin), then to their own system fonts. Apple's fonts can't legally be shipped as web fonts. */
+:root{--num:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif}
+html[lang=ar]{--sys:-apple-system,BlinkMacSystemFont,'SF Arabic','Cairo','Segoe UI','Noto Sans Arabic',Tahoma,sans-serif;--track:0;--label-size:14px;--hw:300;--lh:1.3}
+html[lang=en],html[lang=fr]{--sys:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--track:.16em;--label-size:12px;--hw:300;--lh:1.06}
+html[lang=zh]{--sys:-apple-system,BlinkMacSystemFont,'PingFang SC','Inter','Microsoft YaHei','Noto Sans SC','Noto Sans CJK SC',sans-serif;--track:.1em;--label-size:13px;--hw:300;--lh:1.3}
+html[lang=ja]{--sys:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Inter','Yu Gothic','Noto Sans JP','Noto Sans CJK JP',sans-serif;--track:.1em;--label-size:13px;--hw:300;--lh:1.3}
+html{--head:var(--sys);--body:var(--sys);--label:var(--sys)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--ivory);color:var(--ink);font-family:var(--body);font-weight:300;font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}
@@ -28,11 +33,11 @@ button{font:inherit;color:inherit}
 .wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
 .eyebrow{font-family:var(--label);font-size:var(--label-size);letter-spacing:var(--track);text-transform:uppercase;font-weight:400;color:var(--copper)}
 h1,h2,h3{font-family:var(--head);font-weight:var(--hw);line-height:var(--lh)}
-html[lang=ar] h1,html[lang=ar] h2{letter-spacing:-.01em}
+h1,h2{letter-spacing:-.02em}
+html[lang=ar] h1,html[lang=ar] h2{letter-spacing:0}
 h2{font-size:clamp(36px,4.6vw,68px)}
-html[lang=en] h2,html[lang=fr] h2{font-size:clamp(40px,5.2vw,76px)}
+html[lang=en] h2,html[lang=fr] h2{font-size:clamp(36px,4.4vw,64px)}
 em{font-style:normal;color:var(--copper)}
-html[lang=en] em,html[lang=fr] em{font-style:italic}
 .btn{display:inline-flex;align-items:center;gap:14px;font-family:var(--label);font-size:calc(var(--label-size) + 1px);letter-spacing:calc(var(--track) * .7);text-transform:uppercase;font-weight:400;padding:17px 30px;border:1px solid var(--copper);transition:background .4s var(--ease),border-color .4s,color .4s;cursor:pointer}
 .btn.solid{background:var(--copper);color:var(--ivory)}
 .btn:active{transform:translateY(1px)}
@@ -68,9 +73,9 @@ body::after{content:"";position:fixed;inset:0;z-index:80;pointer-events:none;opa
 #intro .iword{width:min(46vw,300px)}
 #intro .iword svg{width:100%;height:auto;display:block;overflow:visible}
 #intro .iword path{opacity:0}
-#intro .ital{font-family:'IBM Plex Sans Arabic';font-size:14px;color:var(--muted);opacity:0;letter-spacing:0}
+#intro .ital{font-family:var(--sys);font-size:14px;color:var(--muted);opacity:0;letter-spacing:0}
 #intro .skip{position:absolute;bottom:28px;inset-inline-end:var(--pad);background:none;border:0;font-family:var(--label);font-size:var(--label-size);letter-spacing:var(--track);text-transform:uppercase;color:var(--muted);cursor:pointer;padding:10px 0;border-bottom:1px solid var(--line)}
-#intro .count{position:absolute;bottom:34px;inset-inline-start:var(--pad);font-family:'Jost';font-size:12px;letter-spacing:.2em;color:var(--muted);direction:ltr}
+#intro .count{position:absolute;bottom:34px;inset-inline-start:var(--pad);font-family:var(--sys);font-size:12px;letter-spacing:.2em;color:var(--muted);direction:ltr}
 
 /* ---------- header ---------- */
 header{position:sticky;top:0;z-index:50;background:rgba(248,243,236,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .4s}
@@ -85,7 +90,7 @@ header.scrolled{border-color:var(--line)}
 .menu a:hover::after{width:100%}
 .nav-r{display:flex;align-items:center;gap:22px}
 .langm{position:relative}
-.langm>button{display:flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;color:var(--ink-2);padding:8px 2px;font-family:'Jost';font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.langm>button{display:flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;color:var(--ink-2);padding:8px 2px;font-family:var(--sys);font-size:13px;letter-spacing:.12em;text-transform:uppercase}
 .langm>button svg{width:20px;height:20px}
 .langm ul{position:absolute;top:calc(100% + 8px);inset-inline-end:0;min-width:170px;list-style:none;background:var(--ivory);border:1px solid var(--line);box-shadow:0 18px 40px -18px rgba(38,48,59,.35);padding:6px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .25s,transform .25s,visibility .25s;z-index:60}
 .langm.open ul{opacity:1;visibility:visible;transform:none}
@@ -117,7 +122,7 @@ html[dir] .drawer.open .panel{transform:none}
 .hero{position:relative;padding:clamp(28px,4.5vw,64px) 0 clamp(60px,8vw,120px);overflow:hidden}
 .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(32px,6vw,96px);align-items:center}
 .hero h1{font-size:clamp(40px,4.7vw,72px);margin:22px 0 26px}
-html[lang=en] .hero h1,html[lang=fr] .hero h1{font-size:clamp(42px,5vw,76px);max-width:15ch}
+html[lang=en] .hero h1,html[lang=fr] .hero h1{font-size:clamp(40px,4.6vw,68px);max-width:16ch}
 .hero p.lead{font-size:clamp(17px,1.35vw,20px);color:var(--ink-2);max-width:540px}
 .hero .ctas{display:flex;flex-wrap:wrap;gap:16px;margin-top:36px}
 .arch{position:relative;aspect-ratio:4/5.2;border-radius:999px 999px 0 0;overflow:hidden;background:var(--sand)}
@@ -131,13 +136,13 @@ html[lang=en] .hero h1,html[lang=fr] .hero h1{font-size:clamp(42px,5vw,76px);max
 /* ribbon */
 .ribbon{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:22px 0;direction:ltr}
 .ribbon .track{display:inline-flex;gap:56px;font-family:var(--head);font-size:18px;color:var(--ink-2);will-change:transform}
-html[lang=en] .ribbon .track,html[lang=fr] .ribbon .track{font-family:'Cormorant Garamond';font-size:19px;letter-spacing:.3em;text-transform:uppercase}
+html[lang=en] .ribbon .track,html[lang=fr] .ribbon .track{font-size:15px;letter-spacing:.24em;text-transform:uppercase}
 .ribbon .track i{color:var(--copper);font-style:normal}
 
 /* sections */
 section{padding:clamp(80px,11vw,170px) 0}
 .about-grid{display:grid;grid-template-columns:5fr 7fr;gap:clamp(32px,6vw,110px)}
-.about .name{font-family:'Alexandria';font-weight:200;font-size:clamp(90px,13vw,200px);line-height:.95;color:var(--copper)}
+.about .name{font-family:var(--sys);font-weight:200;font-size:clamp(90px,13vw,200px);line-height:.95;color:var(--copper)}
 .about .name small{display:block;font-family:var(--label);font-weight:300;font-size:var(--label-size);letter-spacing:var(--track);text-transform:uppercase;color:var(--muted);margin-top:26px;line-height:1.8}
 .about h2{margin:22px 0 34px}
 .about p{color:var(--ink-2);max-width:620px;margin-bottom:20px}
@@ -145,7 +150,7 @@ section{padding:clamp(80px,11vw,170px) 0}
 .facts div{padding:26px 0 0 22px}
 html[dir=rtl] .facts div{padding:26px 0 0 22px}
 .facts b{display:block;font-family:var(--head);font-weight:300;font-size:clamp(28px,2.8vw,40px);line-height:1.2;color:var(--ink);margin-bottom:6px}
-.facts b.num{font-family:'Cormorant Garamond';font-size:clamp(34px,3.4vw,46px)}
+.facts b.num{font-family:var(--num);font-size:clamp(34px,3.4vw,46px)}
 .facts span{font-family:var(--label);font-size:calc(var(--label-size) - 1px);letter-spacing:calc(var(--track)*.5);color:var(--muted)}
 
 /* chain (pinned on desktop) */
@@ -157,7 +162,7 @@ html[dir=rtl] .facts div{padding:26px 0 0 22px}
 .steps .fill{background:var(--copper);transform-origin:left center;transform:scaleX(0)}
 html[dir=rtl] .steps .fill{transform-origin:right center}
 .step{position:relative;padding-inline-end:24px}
-.step .n{width:76px;height:76px;border-radius:50%;border:1px solid var(--line);background:var(--sand-2);display:grid;place-items:center;font-family:'Cormorant Garamond';font-size:24px;color:var(--muted);margin-bottom:34px;position:relative;transition:background .5s,border-color .5s,color .5s}
+.step .n{width:76px;height:76px;border-radius:50%;border:1px solid var(--line);background:var(--sand-2);display:grid;place-items:center;font-family:var(--num);font-size:24px;color:var(--muted);margin-bottom:34px;position:relative;transition:background .5s,border-color .5s,color .5s}
 .step h3{font-size:clamp(24px,2.1vw,30px);margin-bottom:10px;transition:color .5s}
 .step p{font-size:15px;color:var(--muted)}
 .step.on .n{border-color:var(--copper);color:var(--copper)}
@@ -177,7 +182,7 @@ html[dir=rtl] .steps .fill{transform-origin:right center}
 .svc{list-style:none;border-top:1px solid rgba(248,243,236,.16)}
 .svc li{display:grid;grid-template-columns:70px 1fr;gap:20px;padding:34px 0;border-bottom:1px solid rgba(248,243,236,.16);transition:padding .5s var(--ease)}
 .svc li:hover{padding-inline-start:12px}
-.svc .k{font-family:'Cormorant Garamond';font-size:22px;color:var(--copper-l)}
+.svc .k{font-family:var(--num);font-size:22px;color:var(--copper-l)}
 .svc h3{font-size:clamp(26px,2.4vw,36px);margin-bottom:8px;color:var(--ivory)}
 .svc p{color:rgba(248,243,236,.62);font-size:16px;max-width:520px}
 .dark .btn.solid{background:var(--ivory);color:var(--ink);border-color:var(--ivory)}
@@ -207,7 +212,7 @@ html[dir=rtl] .steps .fill{transform-origin:right center}
 .tile .tag{font-family:var(--label);font-size:calc(var(--label-size) - 2px);letter-spacing:var(--track);text-transform:uppercase;color:var(--muted)}
 .tile.big .tag{color:#d9b9a3}
 .tile h3{font-size:32px}
-.tile .ph{font-family:'Cormorant Garamond';font-size:24px;letter-spacing:.3em;color:rgba(38,48,59,.28);text-transform:uppercase}
+.tile .ph{font-family:var(--num);font-size:24px;letter-spacing:.3em;color:rgba(38,48,59,.28);text-transform:uppercase}
 .tile .more{font-family:var(--label);font-size:calc(var(--label-size) - 1px);letter-spacing:calc(var(--track)*.7);text-transform:uppercase;color:var(--copper)}
 .tile.soon{border:1px dashed rgba(155,106,79,.45);background:transparent}
 
@@ -225,8 +230,8 @@ html[dir=rtl] .steps .fill{transform-origin:right center}
 .pin circle.c{fill:var(--copper)}
 .pin circle.p{fill:none;stroke:var(--copper);stroke-width:1;transform-box:fill-box;transform-origin:center;animation:pulse 2.8s ease-out infinite;animation-play-state:paused}
 .pin.live circle.p{animation-play-state:running}
-.pin text{font-family:'IBM Plex Sans Arabic';font-size:15px;fill:var(--ink)}
-html[lang=en] .pin text,html[lang=fr] .pin text{font-family:'Jost';font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+.pin text{font-family:var(--sys);font-size:15px;fill:var(--ink)}
+html[lang=en] .pin text,html[lang=fr] .pin text{font-family:var(--sys);font-size:13px;letter-spacing:.18em;text-transform:uppercase}
 @keyframes pulse{from{transform:scale(1);opacity:.9}to{transform:scale(4.2);opacity:0}}
 .route{fill:none;stroke:var(--copper);stroke-width:1;stroke-dasharray:3 5;opacity:.6}
 
@@ -324,3 +329,7 @@ html[lang=ja] h1,html[lang=ja] h2,html[lang=zh] h1,html[lang=zh] h2{word-break:a
 
 .ft-top .ft-lbl{display:block;font-size:12px;color:var(--copper-l);margin:14px 0 4px}
 .ft-top a.ft-ltr{unicode-bidi:isolate;text-align:start}
+
+/* numerals: lining + tabular so figures align */
+.facts b.num,.step .n,.svc .k,#intro .count{font-variant-numeric:lining-nums tabular-nums;font-weight:300}
+.about .name{font-weight:200}
