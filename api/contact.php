@@ -87,6 +87,12 @@ $headers = [
 ];
 if ($data['email'] !== '') $headers[] = 'Reply-To: ' . $data['email'];
 
-$sent = @mail($config['to'], $subject, implode("\n", $lines), implode("\r\n", $headers));
+// set the envelope sender to the site's own mailbox so the message passes the domain's SPF check
+$body = implode("\n", $lines);
+$head = implode("\r\n", $headers);
+$envelope = preg_match('/[^\s<>]+@[^\s<>]+/', (string)$config['from'], $m) ? '-f' . $m[0] : '';
+$sent = $envelope !== '' && @mail($config['to'], $subject, $body, $head, $envelope);
+if (!$sent) $sent = @mail($config['to'], $subject, $body, $head);
+if (!$sent) error_log('REMAL contact form: mail() failed for ' . $config['to']);
 if (!$sent && !$csv) respond(502, ['ok' => false, 'error' => 'mail']);
-respond(200, ['ok' => true]);
+respond(200, ['ok' => true, 'mailed' => $sent]);
