@@ -355,3 +355,10 @@ html[lang=ja] h1,html[lang=ja] h2,html[lang=zh] h1,html[lang=zh] h2{word-break:a
 @keyframes sentin{from{opacity:0;transform:translateY(12px)}}
 @keyframes sentdraw{to{stroke-dashoffset:0}}
 @media (prefers-reduced-motion:reduce){.sentbox,.sentbox svg path{animation:none;stroke-dashoffset:0}}
+
+/* floating WhatsApp button (support line) */
+.wa{position:fixed;bottom:calc(clamp(18px,2.4vw,28px) + env(safe-area-inset-bottom,0px));inset-inline-end:clamp(16px,2.4vw,28px);z-index:70;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--ivory);border:1px solid rgba(248,243,236,.22);box-shadow:0 14px 30px -14px rgba(38,48,59,.6);transition:background .4s var(--ease),transform .4s var(--ease)}
+.wa svg{width:25px;height:25px;fill:currentColor}
+.wa:hover{background:var(--copper);transform:translateY(-2px)}
+.wa:focus-visible{outline:2px solid var(--copper);outline-offset:3px}
+@media print{.wa{display:none}}
