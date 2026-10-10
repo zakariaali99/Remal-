@@ -86,6 +86,8 @@
  "f.note": "Nous répondons sous deux jours ouvrés.",
  "f.send": "Envoyer la demande",
  "f.thanks": "Merci, nous vous contacterons très prochainement.",
+ "f.sentTitle": "Votre demande a bien été envoyée",
+ "f.again": "Envoyer une autre demande",
  "f.sending": "Envoi…",
  "e.req": "Ce champ est obligatoire.",
  "e.email": "Saisissez une adresse e-mail valide.",

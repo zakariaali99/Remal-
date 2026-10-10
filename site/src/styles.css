@@ -342,3 +342,16 @@ html[lang=ja] h1,html[lang=ja] h2,html[lang=zh] h1,html[lang=zh] h2{word-break:a
 .tile.brandtile .latin{font-family:var(--num);font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-2);margin-top:8px}
 .tile.brandtile .more{color:var(--ink-2)}
 @media (max-width:1080px){.tile.big{grid-row:auto}}
+
+/* form confirmation */
+.formpanel [hidden]{display:none!important}
+.formpanel.done{display:flex;align-items:center;justify-content:center}
+.sentbox{display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding:clamp(36px,7vw,84px) 0;animation:sentin .6s var(--ease) both}
+.sentbox svg{width:68px;height:68px;fill:none;stroke:var(--copper);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.sentbox svg path{stroke-dasharray:30;stroke-dashoffset:30;animation:sentdraw .5s .35s var(--ease) forwards}
+.sentbox h3{font-family:var(--head);font-size:clamp(24px,3vw,34px);color:var(--ink)}
+.sentbox p{color:var(--muted);max-width:34ch}
+.sentbox .btn{margin-top:10px}
+@keyframes sentin{from{opacity:0;transform:translateY(12px)}}
+@keyframes sentdraw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.sentbox,.sentbox svg path{animation:none;stroke-dashoffset:0}}

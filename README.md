@@ -57,7 +57,7 @@ plain HTML/CSS/JS, and the only server code is `api/contact.php`, which runs on 
 
 ### One-time setup (Libyan Spider: external SSH is closed and the server has no rsync, so we deploy over **FTPS**)
 1. **cPanel → FTP Accounts:** create `deploy@remalperfumes.ly` with **Directory = `public_html`** and a strong password.
-2. **cPanel once:** run AutoSSL (SSL/TLS Status), create `info@` and `no-reply@remalperfumes.ly` (Email Accounts), and set PHP 8.1+ (MultiPHP Manager).
+2. **cPanel once:** run AutoSSL (SSL/TLS Status), create `contact@` and `no-reply@remalperfumes.ly` (Email Accounts), and set PHP 8.1+ (MultiPHP Manager).
 3. **Deploy from the Mac:** create `remal/.deploy.env` (gitignored):
    ```
    FTP_HOST=ftp.remalperfumes.ly

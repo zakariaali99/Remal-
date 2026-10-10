@@ -70,16 +70,18 @@ $lines = [
     "نوع الطلب / Type: {$kindLabel}",
     "الاسم / Name: {$data['name']}",
     "الشركة / Company: {$data['company']}",
-    "الدولة / Country: {$data['country']}",
-    "المدينة / City: {$data['city']}",
-    "النشاط / Business: {$data['type']}",
-    "البريد / Email: {$data['email']}",
+    $data['country'] !== '' ? "الدولة / Country: {$data['country']}" : null,
+    // city and business type are asked only on the retailer tab
+    $data['kind'] === 'retail' && $data['city'] !== '' ? "المدينة / City: {$data['city']}" : null,
+    $data['kind'] === 'retail' && $data['type'] !== '' ? "النشاط / Business: {$data['type']}" : null,
+    $data['email'] !== '' ? "البريد / Email: {$data['email']}" : null,
     "الهاتف / Phone: {$data['phone']}",
     "لغة الصفحة / Page language: {$data['lang']}",
     '',
     'الرسالة / Message:',
     $data['message'],
 ];
+$lines = array_filter($lines, static fn($l) => $l !== null);
 $headers = [
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=UTF-8',

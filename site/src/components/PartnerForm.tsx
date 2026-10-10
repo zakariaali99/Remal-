@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import type { Dict, Key, Lang } from '../i18n'
 import { Arrow } from './ui'
 
@@ -31,6 +31,7 @@ export function PartnerForm({ lang, t, dict }: { lang: Lang; t: (k: Key) => stri
   const [errors, setErrors] = useState<Partial<Record<Field, Key>>>({})
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({})
   const [status, setStatus] = useState<Status>('idle')
+  const panel = useRef<HTMLDivElement>(null)
   const [website, setWebsite] = useState('') // honeypot: bots fill it, people never see it
 
   const set = (f: Field) => (e: { target: { value: string } }) => {
@@ -56,7 +57,10 @@ export function PartnerForm({ lang, t, dict }: { lang: Lang; t: (k: Key) => stri
         body: JSON.stringify({ kind: tab, lang, website, ...v, city: tab === 'retail' ? city : '', country: tab === 'brand' ? v.country : '' }),
       })
       if (!res.ok) throw new Error(String(res.status))
+      // keep the panel's height so the page doesn't jump when the form is replaced by the confirmation
+      if (panel.current) panel.current.style.minHeight = `${panel.current.offsetHeight}px`
       setStatus('sent')
+      requestAnimationFrame(() => panel.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }))
       setV(EMPTY); setTouched({}); setErrors({})
     } catch {
       setStatus('failed')
@@ -73,15 +77,23 @@ export function PartnerForm({ lang, t, dict }: { lang: Lang; t: (k: Key) => stri
   const inv = (f: Field) => ({ 'aria-invalid': !!(errors[f] && touched[f]), 'aria-describedby': `e-${f}` })
 
   return (
-    <div className="formpanel" data-rv>
-      <div className="tabs" role="tablist">
+    <div className={`formpanel${status === 'sent' ? ' done' : ''}`} data-rv ref={panel}>
+      {status === 'sent' && (
+        <div className="sentbox" role="status" aria-live="polite">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /><path d="M14.5 24.5l6.5 6.5 12.5-13.5" /></svg>
+          <h3>{t('f.sentTitle')}</h3>
+          <p>{t('f.thanks')}</p>
+          <button type="button" className="btn" onClick={() => { if (panel.current) panel.current.style.minHeight = ''; setStatus('idle') }}><span>{t('f.again')}</span></button>
+        </div>
+      )}
+      <div className="tabs" role="tablist" hidden={status === 'sent'}>
         {(['brand', 'retail'] as Tab[]).map((k) => (
           <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'on' : ''} onClick={() => { setTab(k); setErrors({}) }}>
             {t(k === 'brand' ? 'tab1' : 'tab2')}
           </button>
         ))}
       </div>
-      <form noValidate onSubmit={submit}>
+      <form noValidate onSubmit={submit} hidden={status === 'sent'}>
         {field('name', 'f.name', <input id="f-name" name="name" autoComplete="name" required value={v.name} onChange={set('name')} onBlur={blur('name')} {...inv('name')} />)}
         {field('company', 'f.co', <input id="f-company" name="company" autoComplete="organization" required value={v.company} onChange={set('company')} onBlur={blur('company')} {...inv('company')} />)}
         {tab === 'brand' && field('country', 'f.country', <input id="f-country" name="country" autoComplete="country-name" value={v.country} onChange={set('country')} />)}
@@ -107,10 +119,10 @@ export function PartnerForm({ lang, t, dict }: { lang: Lang; t: (k: Key) => stri
         {field('message', 'f.msg', <textarea id="f-message" name="message" value={v.message} onChange={set('message')} />, 'full')}
         <div className="hp" aria-hidden="true"><label>-<input tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} /></label></div>
         <div className="submit">
-          <small aria-live="polite" className={status === 'sent' ? 'ok' : status === 'failed' ? 'bad' : ''}>
-            {t(status === 'sending' ? 'f.sending' : status === 'sent' ? 'f.thanks' : status === 'failed' ? 'e.server' : 'f.note')}
+          <small aria-live="polite" className={status === 'failed' ? 'bad' : ''}>
+            {t(status === 'sending' ? 'f.sending' : status === 'failed' ? 'e.server' : 'f.note')}
           </small>
-          <button className="btn solid" aria-busy={status === 'sending'}><span>{t('f.send')}</span> <Arrow /></button>
+          <button className="btn solid" aria-busy={status === 'sending'} disabled={status === 'sending'}><span>{t('f.send')}</span> <Arrow /></button>
         </div>
       </form>
     </div>

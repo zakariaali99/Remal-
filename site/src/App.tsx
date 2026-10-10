@@ -11,7 +11,7 @@ const NAV = [['#about', 'nav.about'], ['#brands', 'nav.brands'], ['#portfolio', 
 const FACEBOOK = 'https://www.facebook.com/share/1CmyoEmRdq/'
 const PHONE_TEL = '+218915096111'
 const PHONE_SHOW = '+218 91 509 6111'
-const EMAIL = 'info@remalperfumes.ly'
+const EMAIL = 'contact@remalperfumes.ly'
 
 export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
   const t = makeT(dict)
