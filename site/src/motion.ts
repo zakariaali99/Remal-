@@ -125,15 +125,16 @@ function scrollMotion(lang: Lang) {
     steps.forEach((s) => gsap.from(s, { opacity: 0, x: lang === 'ar' ? -30 : 30, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: s, start: 'top 82%' } }))
   })
 
-  // map: draw the border, fill the land, then light Misrata
+  // map: draw the border, fill the land, then light the three hubs
   const land = $<SVGPolygonElement>('.libya .land')
   const L = land.getTotalLength ? land.getTotalLength() : 3000
   gsap.set(land, { strokeDasharray: L, strokeDashoffset: L })
-  const pin = $('.libya .pin')
-  gsap.timeline({ scrollTrigger: { trigger: '#mapbox', start: 'top 75%' } })
+  const mt = gsap.timeline({ scrollTrigger: { trigger: '#mapbox', start: 'top 75%' } })
     .to(land, { strokeDashoffset: 0, duration: 2.4, ease: 'power2.inOut' })
     .to(land, { fillOpacity: 1, duration: 1 }, '-=.8')
-    .from(pin, { opacity: 0, scale: 0, transformOrigin: 'center', duration: 0.7, ease: 'back.out(2)', onComplete: () => pin.classList.add('live') }, '-=.3')
+    .from('.libya .route', { opacity: 0, duration: 0.8 }, '-=.4')
+  // the hubs light up one after another, west to east
+  $$('.libya .pin').forEach((pin) => mt.from(pin, { opacity: 0, scale: 0, transformOrigin: 'center', duration: 0.6, ease: 'back.out(2)', onComplete: () => pin.classList.add('live') }, '-=.3'))
 }
 
 function cursor() {

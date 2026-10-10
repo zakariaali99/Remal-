@@ -7,9 +7,11 @@ type Field = 'name' | 'company' | 'country' | 'city' | 'otherCity' | 'email' | '
 type Values = Record<Field, string>
 type Status = 'idle' | 'sending' | 'sent' | 'failed'
 
-const EMPTY: Values = { name: '', company: '', country: '', city: 'misrata', otherCity: '', email: '', phone: '', type: 'perfumery', message: '' }
+const EMPTY: Values = { name: '', company: '', country: '', city: 'tripoli', otherCity: '', email: '', phone: '', type: 'perfumery', message: '' }
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const PHONE_RE = /^\+?[0-9\s\-()]{8,18}$/
+const HUB_CITIES = ['tripoli', 'misrata', 'benghazi'] as const
+type Hub = (typeof HUB_CITIES)[number]
 const TYPES = [['perfumery', 'f.t1'], ['distributor', 'f.t2'], ['department-store', 'f.t3'], ['pharmacy-beauty', 'f.t4']] as const
 
 function validate(v: Values, tab: Tab): Partial<Record<Field, Key>> {
@@ -47,7 +49,7 @@ export function PartnerForm({ lang, t, dict }: { lang: Lang; t: (k: Key) => stri
     if (first) { document.getElementById(`f-${first}`)?.focus(); return }
     setStatus('sending')
     try {
-      const city = v.city === 'other' ? v.otherCity : dict['f.misrata']
+      const city = v.city === 'other' ? v.otherCity : dict[`c.${v.city as Hub}`]
       const res = await fetch('/api/contact.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,7 +87,7 @@ export function PartnerForm({ lang, t, dict }: { lang: Lang; t: (k: Key) => stri
         {tab === 'brand' && field('country', 'f.country', <input id="f-country" name="country" autoComplete="country-name" value={v.country} onChange={set('country')} />)}
         {tab === 'retail' && field('city', 'f.city', (
           <select id="f-city" name="city" value={v.city} onChange={set('city')}>
-            <option value="misrata">{t('f.misrata')}</option>
+            {HUB_CITIES.map((c) => <option key={c} value={c}>{t(`c.${c}`)}</option>)}
             <option value="other">{t('f.otherCity')}</option>
           </select>
         ))}

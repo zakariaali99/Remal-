@@ -12,4 +12,11 @@ export const MAP_H = Math.round((Y1 - 19.3) * S + 40)
 export const OUTLINE_POINTS = OUTLINE.map(([lo, la]) => project(lo, la).map((n) => n.toFixed(1)).join(',')).join(' ')
 export const GRID_X = [10, 13, 16, 19, 22, 25].map((lo) => project(lo, 20)[0])
 export const GRID_Y = [20, 23, 26, 29, 32].map((la) => project(9, la)[1])
-export const MISRATA = project(15.09, 32.38)
+// the three hubs, west to east
+export const HUBS = [
+  { key: 'tripoli', xy: project(13.19, 32.89), dx: 14, dy: -14, anchor: 'start' },
+  { key: 'misrata', xy: project(15.09, 32.38), dx: 6, dy: 36, anchor: 'start' },
+  { key: 'benghazi', xy: project(20.07, 32.12), dx: -14, dy: -14, anchor: 'end' },
+] as const
+const [T, M, B] = HUBS.map((h) => h.xy)
+export const ROUTE = `M${T[0].toFixed(1)} ${T[1].toFixed(1)} Q${((T[0] + M[0]) / 2).toFixed(1)} ${(T[1] + 40).toFixed(1)} ${M[0].toFixed(1)} ${M[1].toFixed(1)} Q${((M[0] + B[0]) / 2).toFixed(1)} ${(M[1] + 110).toFixed(1)} ${B[0].toFixed(1)} ${B[1].toFixed(1)}`

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { LANGS, makeT, type Dict, type Lang } from './i18n'
 import { Mark, Wordmark } from './lib/brand'
-import { GRID_X, GRID_Y, MAP_H, MAP_W, MISRATA, OUTLINE_POINTS } from './lib/libya'
+import { GRID_X, GRID_Y, HUBS, MAP_H, MAP_W, OUTLINE_POINTS, ROUTE } from './lib/libya'
 import { LangList, LangMenu } from './components/LangMenu'
 import { PartnerForm } from './components/PartnerForm'
 import { Arrow, Dune, Html } from './components/ui'
@@ -175,6 +175,14 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
                 <img src="/img/bottle-rock.jpg" alt="" loading="lazy" width={1800} height={1350} />
                 <div className="cap"><div className="tag">{t('pf.soon')}</div><h3>{t('pf.soonh')}</h3></div>
               </div>
+              <div className="tile brandtile" data-rv>
+                <div className="tag">{t('pf.partner')}</div>
+                <div>
+                  <h3 lang="ar" dir="rtl">الماجد للعود</h3>
+                  <div className="latin" lang="en" dir="ltr">Almajed for Oud</div>
+                </div>
+                <div className="more">{t('pf.majed.meta')}</div>
+              </div>
               <a href="#partner" className="tile soon" data-rv>
                 <div className="tag">{t('pf.yours')}</div><h3>{t('pf.yoursh')}</h3><div className="more">{t('pf.touch')}</div>
               </a>
@@ -189,23 +197,24 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
               <Html as="h2" data-split html={t('map.h2')} />
               <p data-rv>{t('map.p')}</p>
               <ul className="cities">
-                <li data-rv><b>{t('map.hq')}</b><span>{t('map.hqs')}</span></li>
-                <li data-rv className="soon"><b>{t('map.grow')}</b><span>{t('map.grows')}</span></li>
+                {HUBS.map((h) => <li key={h.key} data-rv><b>{t(`c.${h.key}`)}</b><span>{t(`c.${h.key}.s`)}</span></li>)}
               </ul>
             </div>
             <div id="mapbox">
-              <svg className="libya" viewBox={`0 0 ${MAP_W} ${MAP_H}`} role="img" aria-label={t('map.hq')}>
+              <svg className="libya" viewBox={`0 0 ${MAP_W} ${MAP_H}`} role="img" aria-label={t('map.aria')}>
                 <g className="grid">
                   {GRID_X.map((x) => <line key={`x${x}`} x1={x} y1={0} x2={x} y2={MAP_H} />)}
                   {GRID_Y.map((y) => <line key={`y${y}`} x1={0} y1={y} x2={MAP_W} y2={y} />)}
                 </g>
                 <polygon className="land" points={OUTLINE_POINTS} />
-                <g className="pin">
-                  <circle className="p" cx={MISRATA[0]} cy={MISRATA[1]} r={5} />
-                  <circle className="p p2" cx={MISRATA[0]} cy={MISRATA[1]} r={5} />
-                  <circle className="c" cx={MISRATA[0]} cy={MISRATA[1]} r={6} />
-                  <text x={MISRATA[0] + 16} y={MISRATA[1] + 30}>{t('map.hq')}</text>
-                </g>
+                <path className="route" d={ROUTE} />
+                {HUBS.map((h, i) => (
+                  <g className="pin" key={h.key}>
+                    <circle className="p" cx={h.xy[0]} cy={h.xy[1]} r={5} style={{ animationDelay: `${i * 0.9}s` }} />
+                    <circle className="c" cx={h.xy[0]} cy={h.xy[1]} r={5} />
+                    <text x={h.xy[0] + h.dx} y={h.xy[1] + h.dy} textAnchor={h.anchor}>{t(`c.${h.key}`)}</text>
+                  </g>
+                ))}
               </svg>
             </div>
           </div>
