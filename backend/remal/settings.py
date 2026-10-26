@@ -139,7 +139,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {"contact": "8/hour"},
 }
 
-CORS_ALLOWED_ORIGINS = env_list("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8767")
+CORS_ALLOWED_ORIGINS = env_list("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8767,http://127.0.0.1:8767")
 CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
 CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS if not h.startswith(("127.", "localhost"))]
 
