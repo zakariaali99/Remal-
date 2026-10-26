@@ -1,0 +1,36 @@
+{% load dash %}<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+{% include "dashboard/_head.html" %}
+<title>{% block title %}{% endblock %} · لوحة رمال</title>
+</head>
+<body>
+{% with s=request.path %}
+<header class="mtop">{% include "dashboard/_mark.svg" %}<span>{% block mtitle %}لوحة رمال{% endblock %}</span><a class="ava" href="/dashboard/password/" title="الحساب">{{ user.get_username|slice:":1"|upper }}</a></header>
+<div class="app">
+  <aside class="side">
+    <a class="logo" href="/dashboard/">{% include "dashboard/_mark.svg" %}<span>{% include "dashboard/_word.svg" %}<small>لوحة التحكم</small></span></a>
+    <nav class="nav" aria-label="القائمة">
+      <a href="/dashboard/"{% if s == "/dashboard/" %} class="on" aria-current="page"{% endif %}>{% icon "home" %}<span>الرئيسية</span></a>
+      <div class="lbl">الكتالوج</div>
+      <a href="/dashboard/brands/"{% if "/dashboard/brands/" in s %} class="on" aria-current="page"{% endif %}>{% icon "brand" %}<span>العلامات</span></a>
+      <a href="/dashboard/categories/"{% if "/dashboard/categories/" in s %} class="on" aria-current="page"{% endif %}>{% icon "cat" %}<span>الفئات</span></a>
+      <a href="/dashboard/products/"{% if "/dashboard/products/" in s %} class="on" aria-current="page"{% endif %}>{% icon "prod" %}<span>المنتجات</span></a>
+      <div class="lbl">التواصل</div>
+      <a href="/dashboard/inquiries/"{% if "/dashboard/inquiries/" in s %} class="on" aria-current="page"{% endif %}>{% icon "inbox" %}<span>الطلبات</span>{% if nav_new %}<span class="c num">{{ nav_new }}</span>{% endif %}</a>
+    </nav>
+    <div class="foot">
+      <a class="ava" href="/dashboard/password/" title="تغيير كلمة المرور">{{ user.get_username|slice:":1"|upper }}</a>
+      <div><b>{{ user.get_full_name|default:user.get_username }}</b><span><a href="/" target="_blank" rel="noopener">remalperfumes.ly</a></span></div>
+      <form method="post" action="/dashboard/logout/">{% csrf_token %}<button class="iconbtn" style="background:none;border:0;color:inherit" title="تسجيل الخروج">{% icon "out" %}</button></form>
+    </div>
+  </aside>
+  <main class="main">
+{% block body %}{% endblock %}
+  </main>
+</div>
+{% endwith %}
+{% if messages %}<div class="toasts" role="status">{% for m in messages %}<div class="toast {{ m.tags }}">{% if m.tags == "error" %}{% icon "alert" %}{% else %}{% icon "check" %}{% endif %}<span>{{ m }}</span></div>{% endfor %}</div>{% endif %}
+{% load static %}<script src="{% static 'dashboard/dash.js' %}?v=1" defer></script>
+</body>
+</html>

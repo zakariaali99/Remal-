@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /dashboard/
 Sitemap: https://remalperfumes.ly/sitemap.xml
-Sitemap: https://api.remalperfumes.ly/sitemap.xml
+Sitemap: https://remalperfumes.ly/api/sitemap.xml

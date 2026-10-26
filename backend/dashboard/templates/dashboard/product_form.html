@@ -1,0 +1,90 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}{% if is_new %}منتج جديد{% else %}{{ product.name_ar }}{% endif %}{% endblock %}
+{% block mtitle %}{% if is_new %}منتج جديد{% else %}تعديل منتج{% endif %}{% endblock %}
+{% block body %}
+<div class="top">
+  <div><div class="crumb"><a href="/dashboard/products/">المنتجات</a><span>/</span><span>{% if is_new %}جديد{% else %}تعديل{% endif %}</span></div><h1 id="title">{% if is_new %}منتج جديد{% else %}{{ product.name_ar }}{% endif %}</h1></div>
+  <div class="grow"></div>
+  {% if not is_new and product.is_visible %}<a class="btn" href="/products/{{ product.id }}/" target="_blank" rel="noopener">{% icon "eye" %} عرض في الموقع</a>{% endif %}
+</div>
+
+{% if not brands %}
+<div class="card empty"><span class="ic">{% icon "brand" %}</span><b>أضف علامة أولاً</b><span>كل منتج يتبع علامة. أضف العلامة ثم ارجع لإضافة منتجاتها.</span><a class="btn pri" href="/dashboard/brands/new/">{% icon "plus" %} علامة جديدة</a></div>
+{% else %}
+<form method="post" enctype="multipart/form-data" id="product-form" data-dirty novalidate>
+  {% csrf_token %}
+  {{ form.layout }}
+  <div class="ed">
+    <div class="stack">
+      <section class="card">
+        <div class="hd"><h2>العلامة والفئة</h2></div>
+        <div class="bd gap">
+          <div class="f{% if form.brand.errors %} bad{% endif %}">
+            <div class="choices" role="radiogroup" aria-label="العلامة">
+              {% for b in brands %}
+              <label class="choice"><input type="radio" name="brand" value="{{ b.id }}" data-name="{{ b.name_ar }}"{% if form.brand.value|stringformat:"s" == b.id|stringformat:"s" or brands|length == 1 %} checked{% endif %}><span class="lg">{% if b.logo %}<img src="{{ b.logo.url }}" alt="">{% else %}{{ b.name_ar|slice:":1" }}{% endif %}</span><span><b>{{ b.name_ar }}</b>{% if b.tagline_ar %}<span>{{ b.tagline_ar }}</span>{% endif %}</span></label>
+              {% endfor %}
+              <a class="choice add" href="/dashboard/brands/new/"><span class="lg">{% icon "plus" %}</span><span><b>علامة جديدة</b></span></a>
+            </div>
+            {% for e in form.brand.errors %}<span class="err">اختر العلامة.</span>{% endfor %}
+          </div>
+          <div class="f"><label>الفئة</label>
+            <div class="seg">
+              {% for c in categories %}<label><input type="radio" name="category" value="{{ c.id }}"{% if form.category.value|stringformat:"s" == c.id|stringformat:"s" %} checked{% endif %}>{{ c.name_ar }}</label>{% endfor %}
+              <label class="none"><input type="radio" name="category" value=""{% if not form.category.value %} checked{% endif %}>بلا فئة</label>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="f{% if form.size.errors %} bad{% endif %}"><label for="id_size">الحجم <em>(اختياري)</em></label>{{ form.size }}</div>
+            <div class="f{% if form.sku.errors %} bad{% endif %}"><label for="id_sku">رمز الصنف <em>(اختياري)</em></label>{{ form.sku }}</div>
+          </div>
+        </div>
+      </section>
+
+      {% include "dashboard/_langs.html" %}
+
+      <div class="savebar">
+        <span data-state>{% if is_new %}منتج جديد لم يُحفظ{% else %}كل التغييرات محفوظة{% endif %}</span>
+        <a class="btn sm" href="/dashboard/products/">إلغاء</a>
+        {% if is_new %}<button class="btn sm" name="then" value="new">حفظ وإضافة آخر</button>{% endif %}
+        <button class="btn sm pri" name="then" value="stay">حفظ المنتج</button>
+      </div>
+    </div>
+
+    <aside>
+      <section class="card">
+        <div class="hd"><h2>الصور</h2><span class="more" style="color:var(--muted)">اسحب لتغيير الترتيب</span></div>
+        <div class="bd">
+          <label class="drop" data-drop><input type="file" name="photos" accept="image/jpeg,image/png,image/webp,image/*" multiple hidden><span class="ic">{% icon "up" %}</span><b>اسحب الصور هنا أو اختر من جهازك</b><small>JPG أو PNG أو WebP · تُصغَّر تلقائياً</small></label>
+          {% for e in form.photos.errors %}<p class="err" style="margin-top:10px">{{ e }}</p>{% endfor %}
+          <div class="photos" data-photos>
+            {% for im in photos %}<div class="photo" draggable="true" data-id="{{ im.id }}"><img src="{{ im.thumb.url }}" alt=""><button type="button" class="x" title="حذف الصورة">{% icon "x" %}</button></div>{% endfor %}
+          </div>
+          <p class="hint-row">{% icon "star" %} الصورة الأولى هي الغلاف في المعرض.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="bd">
+          <label class="sw"><div><b>ظاهر في الموقع</b><span>يظهر في معرض المنتجات</span></div>{{ form.is_visible }}</label>
+          <label class="sw"><div><b>مميّز</b><span>يظهر أولاً في المعرض</span></div>{{ form.is_featured }}</label>
+        </div>
+      </section>
+
+      <section class="card preview">
+        <div class="lbl">{% icon "eye" %} هكذا يظهر في المعرض</div>
+        <div class="pcard"><div class="ph" data-pv-ph>{% with cover=photos.0 %}{% if cover %}<img src="{{ cover.thumb.url }}" alt="">{% endif %}{% endwith %}</div><div class="tag" data-pv-brand></div><h3 data-pv-name>{{ product.name_ar|default:"اسم المنتج" }}</h3><div class="meta" data-pv-meta></div></div>
+      </section>
+    </aside>
+  </div>
+</form>
+
+{% if not is_new %}
+<form method="post" action="/dashboard/products/{{ product.id }}/delete/" class="danger" style="margin-top:28px" data-confirm="حذف {{ product.name_ar }} وكل صوره نهائياً؟">
+  {% csrf_token %}
+  <div><b>حذف المنتج</b><span>يُحذف من الموقع مع كل صوره، ولا يمكن التراجع. لإخفائه مؤقتاً أطفئ «ظاهر في الموقع» بدلاً من الحذف.</span></div>
+  <button class="btn sm del">{% icon "trash" %} حذف</button>
+</form>
+{% endif %}
+{% endif %}
+{% endblock %}

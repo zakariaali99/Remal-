@@ -1,0 +1,15 @@
+{% load dash %}<section class="card" data-langs>
+  <div class="tabs" role="tablist">
+    {% for p in form.panes %}<button type="button" role="tab" data-tab="{{ p.code }}" class="{% if forloop.first %}on{% endif %}{% if p.errors %} bad{% endif %}"><span class="ok" hidden></span>{{ p.label }}{% if p.optional %} <small>اختياري</small>{% endif %}</button>{% endfor %}
+  </div>
+  <div class="bd">
+    {% for p in form.panes %}
+    <div class="pane gap{% if forloop.first %} on{% endif %}" data-pane="{{ p.code }}" dir="{{ p.dir }}" lang="{{ p.code }}">
+      {% if p.optional %}<p class="hint" dir="rtl" lang="ar">إن تُرك فارغاً يظهر النص الإنجليزي لزوّار هذه اللغة.</p>{% endif %}
+      {% for label, f in p.fields %}
+      <div class="f{% if f.errors %} bad{% endif %}"><label for="{{ f.id_for_label }}" dir="rtl" lang="ar">{{ label }}{% if not p.optional and not f.field.required %} <em>(اختياري)</em>{% endif %}</label>{{ f }}{% for e in f.errors %}<span class="err" dir="rtl">{{ e }}</span>{% endfor %}</div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</section>

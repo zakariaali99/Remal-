@@ -1,6 +1,7 @@
-"""REMAL API: products catalogue, admin dashboard and the partnership form.
+"""REMAL backend: the products API, the dashboard that manages it, and the partnership form.
 
-Runs on Libyan Spider cPanel ("Setup Python App", Passenger) at api.remalperfumes.ly.
+Runs on Libyan Spider cPanel ("Setup Python App", Passenger) on remalperfumes.ly itself, next to the static site:
+Django answers /api/ and /dashboard/, Apache serves every other file.
 Every environment-specific value comes from a `.env` file next to manage.py (see .env.example).
 """
 from pathlib import Path
@@ -39,26 +40,24 @@ ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "127.0.0.1,localhost")
 SITE_URL = env("SITE_URL", "https://remalperfumes.ly").rstrip("/")
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "corsheaders",
     "rest_framework",
     "catalog",
     "inquiries",
+    "dashboard",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "remal.middleware.AdminLoginThrottle",
+    "remal.middleware.LoginThrottle",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -69,13 +68,14 @@ WSGI_APPLICATION = "remal.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "dashboard.context.nav",
             ],
         },
     },
@@ -123,9 +123,8 @@ TIME_ZONE = "Africa/Tripoli"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "/static/"
+STATIC_URL = "/static/"  # collected into ~/public_html/static on the server, so Apache serves it
 STATIC_ROOT = env("STATIC_ROOT") or BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = env("MEDIA_ROOT") or BASE_DIR / "media"
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
@@ -139,8 +138,8 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {"contact": "8/hour"},
 }
 
-CORS_ALLOWED_ORIGINS = env_list("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8767,http://127.0.0.1:8767")
-CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
+LOGIN_URL = "/dashboard/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"
 CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS if not h.startswith(("127.", "localhost"))]
 
 EMAIL_HOST = env("EMAIL_HOST", "localhost")

@@ -1,0 +1,49 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}{{ obj.company }}{% endblock %}{% block mtitle %}طلب شراكة{% endblock %}
+{% block body %}
+<div class="top">
+  <div><div class="crumb"><a href="/dashboard/inquiries/">طلبات الشراكة</a><span>/</span><span>{{ obj.created_at|date:"j F Y · H:i" }}</span></div><h1>{{ obj.company }}</h1></div>
+  <div class="grow"></div>
+  <span class="pill{% if obj.status == 'new' %} new{% elif obj.status == 'contacted' %} ok{% endif %}" style="font-size:14px;padding:6px 14px">{{ obj.get_status_display }}</span>
+</div>
+
+<div class="ed">
+  <div class="stack">
+    <section class="card">
+      <div class="hd"><h2>{{ obj.get_kind_display }}</h2></div>
+      <div class="bd gap">
+        <dl class="kv">
+          <dt>الاسم</dt><dd>{{ obj.name }}</dd>
+          <dt>الشركة / المحل</dt><dd>{{ obj.company }}</dd>
+          {% if obj.country %}<dt>الدولة</dt><dd>{{ obj.country }}</dd>{% endif %}
+          {% if obj.city %}<dt>المدينة</dt><dd>{{ obj.city }}</dd>{% endif %}
+          {% if obj.business_type %}<dt>نوع النشاط</dt><dd>{{ obj.business_type }}</dd>{% endif %}
+          <dt>الهاتف</dt><dd><bdi dir="ltr">{{ obj.phone }}</bdi></dd>
+          {% if obj.email %}<dt>البريد</dt><dd dir="ltr" style="text-align:right">{{ obj.email }}</dd>{% endif %}
+          <dt>لغة الصفحة</dt><dd>{{ obj.lang|upper }}</dd>
+          <dt>نسخة البريد</dt><dd>{% if obj.mailed %}أُرسل إلى <bdi>contact@remalperfumes.ly</bdi>{% else %}لم يُرسل بالبريد، موجود هنا فقط{% endif %}</dd>
+        </dl>
+        {% if obj.message %}<div class="f"><label>الرسالة</label><div class="msg" dir="auto">{{ obj.message }}</div></div>{% endif %}
+      </div>
+    </section>
+  </div>
+  <aside>
+    <section class="card">
+      <div class="hd"><h2>تواصل</h2></div>
+      <div class="bd contact-acts">
+        <a class="btn wa" href="https://wa.me/{{ obj.phone|wa }}" target="_blank" rel="noopener">{% icon "wa" %} واتساب</a>
+        <a class="btn" href="tel:{{ obj.phone }}">{% icon "phone" %} اتصال</a>
+        {% if obj.email %}<a class="btn" href="mailto:{{ obj.email }}?subject={{ 'رمال للعطور'|urlencode }}">{% icon "mail" %} بريد</a>{% endif %}
+      </div>
+    </section>
+    <form method="post" class="card" data-dirty>{% csrf_token %}
+      <div class="hd"><h2>المتابعة</h2></div>
+      <div class="bd gap">
+        <div class="status-seg">{% for r in form.status %}<label>{{ r.tag }}{{ r.choice_label }}</label>{% endfor %}</div>
+        <div class="f"><label for="id_notes">ملاحظات داخلية</label>{{ form.notes }}</div>
+        <div><button class="btn pri">حفظ</button></div>
+      </div>
+    </form>
+  </aside>
+</div>
+{% endblock %}

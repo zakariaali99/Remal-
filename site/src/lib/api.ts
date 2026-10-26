@@ -1,7 +1,7 @@
 import type { Lang } from '../i18n'
 
-// The Django backend (api.remalperfumes.ly). Override with VITE_API for local work, e.g. VITE_API=http://127.0.0.1:8011
-export const API = ((import.meta.env.VITE_API as string | undefined) ?? 'https://api.remalperfumes.ly').replace(/\/$/, '')
+// The Django backend answers /api/ on the site's own domain (locally, Vite forwards /api/ to it: see vite.config.ts)
+export const API = '/api'
 
 export type Ref = { id: string; name: string }
 export type Photo = { id: string; src: string; thumb: string; width: number; height: number }
@@ -14,7 +14,7 @@ export type Page<T> = { count: number; next: string | null; results: T[] }
 export class NotFound extends Error {}
 
 export async function get<T>(pathOrUrl: string, lang: Lang, signal?: AbortSignal): Promise<T> {
-  const url = new URL(pathOrUrl.startsWith('http') ? pathOrUrl : `${API}${pathOrUrl}`)
+  const url = new URL(pathOrUrl.startsWith('http') ? pathOrUrl : `${API}${pathOrUrl}`, location.origin)
   url.searchParams.set('lang', lang)
   const res = await fetch(url, { signal })
   if (res.status === 404) throw new NotFound()

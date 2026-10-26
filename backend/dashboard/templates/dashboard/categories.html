@@ -1,0 +1,27 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}الفئات{% endblock %}{% block mtitle %}الفئات{% endblock %}
+{% block body %}
+<div class="top">
+  <div><h1>الفئات</h1><div class="sub">مثل عطور، عود، بخور. يصفّي بها الزوّار المعرض.</div></div>
+  <div class="grow"></div>
+  <a class="btn pri" href="/dashboard/categories/new/">{% icon "plus" %} فئة جديدة</a>
+</div>
+{% if items %}
+<div class="card" style="overflow:hidden">
+  <ul class="rows" data-sortable="/dashboard/categories/order/">
+    {% for c in items %}
+    <li data-id="{{ c.id }}">
+      <span class="grip" title="اسحب لتغيير الترتيب">{% icon "grip" %}</span>
+      <a class="who" href="/dashboard/categories/{{ c.id }}/"><b>{{ c.name_ar }}</b><span dir="ltr">{{ c.name_en }}</span></a>
+      <a class="n" href="/dashboard/products/?category={{ c.id }}">{{ c.n }} منتج</a>
+      {% if c.is_visible %}<span class="pill ok">ظاهرة</span>{% else %}<span class="pill">مخفية</span>{% endif %}
+      <a class="iconbtn" href="/dashboard/categories/{{ c.id }}/" title="تعديل">{% icon "edit" %}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+<p class="hint-row">{% icon "alert" %} تظهر الفئة في الموقع فقط إذا كان فيها منتج ظاهر.</p>
+{% else %}
+<div class="card empty"><span class="ic">{% icon "cat" %}</span><b>لا فئات بعد</b><span>الفئات اختيارية، لكنها تساعد الزوّار على التصفح.</span><a class="btn pri" href="/dashboard/categories/new/">{% icon "plus" %} فئة جديدة</a></div>
+{% endif %}
+{% endblock %}

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Run on the Libyan Spider server (cPanel Terminal) to deploy the latest API:
+# Run on the Libyan Spider server (cPanel Terminal) to deploy the latest backend (/api/ and /dashboard/):
 #   ~/remal-src/backend/update.sh
 # Pulls main from GitHub, installs requirements, migrates the database, collects static files, restarts the app.
 set -eu
@@ -21,4 +21,4 @@ if [ -n "$MEDIA" ]; then
   printf '%s\n' 'Options -ExecCGI -Indexes' '<FilesMatch "\.(?i:php\d?|phtml|phar|py|pl|cgi|sh)$">' '  Require all denied' '</FilesMatch>' > "$MEDIA/.htaccess"
 fi
 mkdir -p tmp && touch tmp/restart.txt
-echo "API updated to $(git log -1 --format='%h %s')"
+echo "Backend updated to $(git log -1 --format='%h %s')"

@@ -9,16 +9,16 @@ def client_ip(request) -> str:
     return request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip() or request.META.get("REMOTE_ADDR", "0")
 
 
-class AdminLoginThrottle:
+class LoginThrottle:
     """Locks the dashboard login for an IP after repeated wrong passwords."""
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if not (request.path == "/admin/login/" and request.method == "POST"):
+        if not (request.path == "/dashboard/login/" and request.method == "POST"):
             return self.get_response(request)
-        key = f"admin-login-fail:{client_ip(request)}"
+        key = f"login-fail:{client_ip(request)}"
         failures = cache.get(key, 0)
         if failures >= MAX_FAILURES:
             return HttpResponse("محاولات كثيرة. حاول بعد ١٥ دقيقة.", status=429, content_type="text/plain; charset=utf-8")

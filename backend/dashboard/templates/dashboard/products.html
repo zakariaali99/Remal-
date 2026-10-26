@@ -1,0 +1,55 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}المنتجات{% endblock %}{% block mtitle %}المنتجات{% endblock %}
+{% block body %}
+<div class="top">
+  <div><h1>المنتجات</h1><div class="sub">{{ total }} منتج في المعرض{% if page.paginator.count != total %} · يظهر {{ page.paginator.count }} حسب البحث{% endif %}</div></div>
+  <div class="grow"></div>
+  <a class="btn pri" href="/dashboard/products/new/">{% icon "plus" %} منتج جديد</a>
+</div>
+
+<form class="bar" method="get" data-autosubmit>
+  <label class="search">{% icon "search" %}<input type="search" name="q" value="{{ q }}" placeholder="ابحث بالاسم أو رمز الصنف" aria-label="بحث"></label>
+  <div class="chips">
+    {% if brands|length > 1 %}<select name="brand" aria-label="العلامة"><option value="">كل العلامات</option>{% for b in brands %}<option value="{{ b.id }}"{% if brand == b.id|stringformat:"s" %} selected{% endif %}>{{ b.name_ar }}</option>{% endfor %}</select>{% endif %}
+    {% if categories %}<select name="category" aria-label="الفئة"><option value="">كل الفئات</option>{% for c in categories %}<option value="{{ c.id }}"{% if category == c.id|stringformat:"s" %} selected{% endif %}>{{ c.name_ar }}</option>{% endfor %}</select>{% endif %}
+    <select name="status" aria-label="الحالة">
+      <option value="">كل الحالات</option>
+      <option value="visible"{% if status == "visible" %} selected{% endif %}>ظاهر</option>
+      <option value="hidden"{% if status == "hidden" %} selected{% endif %}>مخفي</option>
+      <option value="featured"{% if status == "featured" %} selected{% endif %}>مميّز</option>
+      <option value="nophotos"{% if status == "nophotos" %} selected{% endif %}>بلا صور</option>
+    </select>
+  </div>
+  <noscript><button class="btn sm">تطبيق</button></noscript>
+</form>
+
+{% if page.object_list %}
+<ul class="grid" style="list-style:none">
+  {% if not q and not brand and not category and not status and page.number == 1 %}
+  <li class="pitem new"><a href="/dashboard/products/new/"><span><span class="ic">{% icon "plus" %}</span>أضف منتجاً</span></a></li>
+  {% endif %}
+  {% for p in page %}{% with cover=p.images.all.0 %}
+  <li class="pitem{% if not p.is_visible %} off{% endif %}"{% if forloop.counter0 < 12 %} style="animation-delay:{% widthratio forloop.counter0 1 35 %}ms"{% endif %}>
+    <form method="post" action="/dashboard/products/{{ p.id }}/visible/" data-toggle>{% csrf_token %}<button class="eye" title="{% if p.is_visible %}إخفاء من الموقع{% else %}إظهار في الموقع{% endif %}">{% if p.is_visible %}{% icon "eye" %}{% else %}{% icon "eyeoff" %}{% endif %}</button></form>
+    <a href="/dashboard/products/{{ p.id }}/">
+      <div class="ph">{% if cover %}<img src="{{ cover.thumb.url }}" alt="" loading="lazy" width="{{ cover.width }}" height="{{ cover.height }}">{% else %}{% icon "photo" %}{% endif %}
+        <div class="badges">{% if not p.is_visible %}<span class="badge">مخفي</span>{% endif %}{% if p.is_featured %}<span class="badge cp">مميّز</span>{% endif %}{% if not cover %}<span class="badge" style="background:var(--warn)">بلا صور</span>{% endif %}</div>
+      </div>
+      <div class="tx"><div class="tag">{{ p.brand.name_ar }}</div><h3>{{ p.name_ar }}</h3><div class="meta">{{ p.category.name_ar|default:"بلا فئة" }}{% if p.size %} · <bdi>{{ p.size }}</bdi>{% endif %}</div></div>
+    </a>
+  </li>
+  {% endwith %}{% endfor %}
+</ul>
+{% if page.has_other_pages %}
+<nav class="pager">
+  {% if page.has_previous %}<a class="btn sm" href="?{{ keep }}&page={{ page.previous_page_number }}">السابق</a>{% endif %}
+  <span class="num">صفحة {{ page.number }} من {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="btn sm" href="?{{ keep }}&page={{ page.next_page_number }}">التالي</a>{% endif %}
+</nav>
+{% endif %}
+{% elif total %}
+<div class="card empty"><span class="ic">{% icon "search" %}</span><b>لا نتائج</b><span>جرّب كلمة أخرى أو أزل التصفية.</span><a class="btn" href="/dashboard/products/">عرض كل المنتجات</a></div>
+{% else %}
+<div class="card empty"><span class="ic">{% icon "prod" %}</span><b>المعرض فارغ</b><span>أضف أول منتج وسيظهر في صفحة المنتجات على الموقع.</span><a class="btn pri" href="/dashboard/products/new/">{% icon "plus" %} منتج جديد</a></div>
+{% endif %}
+{% endblock %}

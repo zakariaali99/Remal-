@@ -6,12 +6,12 @@ It is Arabic-first and also comes in English, French, Chinese and Japanese. The 
 ```
 remal/
 ├── brand/            official logo extracted as SVG + brand images (source: logo PDF from the client)
-├── backend/          the API + dashboard (Django) at api.remalperfumes.ly: products, brands, enquiries. See backend/README.md
+├── backend/          the products API (/api/) and the dashboard (/dashboard/), Django on the same domain. See backend/README.md
 └── site/             the website (Vite + React + Tailwind, pre-rendered to static HTML)
     ├── src/
     │   ├── App.tsx               page structure (all sections)
     │   ├── components/           LangMenu, PartnerForm, Products (gallery + single product), ui helpers
-    │   ├── lib/api.ts            API address (VITE_API) and response types
+    │   ├── lib/api.ts            the /api/ client and response types
     │   ├── i18n/{ar,en,fr,zh,ja}.json   ALL site text, one file per language
     │   ├── lib/brand.tsx         logo components (generated from brand/*.svg)
     │   ├── lib/libya.ts          map outline + Misrata pin
@@ -59,7 +59,7 @@ plain HTML/CSS/JS. All server code is the Django API in `backend/`.
 
 ### One-time setup (Libyan Spider: external SSH is closed and the server has no rsync, so we deploy over **FTPS**)
 1. **cPanel → FTP Accounts:** create `deploy@remalperfumes.ly` with **Directory = `public_html`** and a strong password.
-2. **cPanel once:** run AutoSSL (SSL/TLS Status), create `contact@` and `no-reply@remalperfumes.ly` (Email Accounts). The API (`backend/`) also needs `api.remalperfumes.ly`, see backend/README.md.
+2. **cPanel once:** run AutoSSL (SSL/TLS Status), create `contact@` and `no-reply@remalperfumes.ly` (Email Accounts). The backend (`backend/`) runs as a cPanel Python app on the same domain, see backend/README.md.
 3. **Deploy from the Mac:** create `remal/.deploy.env` (gitignored):
    ```
    FTP_HOST=ftp.remalperfumes.ly

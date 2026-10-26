@@ -21,12 +21,12 @@ class GalleryPage(PageNumberPagination):
 
 
 class Cached:
-    """Lets browsers and proxies keep public catalogue responses for a few minutes."""
+    """Lets browsers keep public catalogue responses for a minute, so dashboard edits show up quickly."""
 
     def finalize_response(self, request, response, *args, **kwargs):
         response = super().finalize_response(request, response, *args, **kwargs)
         if response.status_code == 200:
-            patch_cache_control(response, public=True, max_age=300)
+            patch_cache_control(response, public=True, max_age=60)
         return response
 
 
@@ -49,7 +49,7 @@ def visible_products():
 
 
 class ProductList(Cached, generics.ListAPIView):
-    """GET /products/?lang=&brand=<id>&category=<id>&page="""
+    """GET /api/products/?lang=&brand=<id>&category=<id>&page="""
 
     serializer_class = ProductListSerializer
     pagination_class = GalleryPage
@@ -64,7 +64,7 @@ class ProductList(Cached, generics.ListAPIView):
 
 
 class ProductDetail(Cached, generics.RetrieveAPIView):
-    """GET /products/<id>/?lang="""
+    """GET /api/products/<id>/?lang="""
 
     serializer_class = ProductDetailSerializer
     queryset = visible_products()

@@ -1,0 +1,56 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}الرئيسية{% endblock %}
+{% block body %}
+<section class="hello">
+  <div class="bg"></div>
+  <div>
+    <div class="eyb">{{ today|date:"l · j F" }}</div>
+    <h1>أهلاً {{ user.first_name|default:"بك" }} في لوحة رمال</h1>
+    <p>كل ما تضيفه هنا يظهر في معرض المنتجات على الموقع مباشرة.</p>
+  </div>
+  <div class="acts">
+    <a class="btn" href="/products/" target="_blank" rel="noopener">{% icon "site" %} عرض المعرض</a>
+    <a class="btn pri" href="/dashboard/products/new/">{% icon "plus" %} منتج جديد</a>
+  </div>
+</section>
+
+<section class="stats">
+  <a class="card stat" href="/dashboard/products/"><div class="k"><i>{% icon "prod" %}</i> المنتجات</div><b class="num">{{ product_count }}</b><small><span class="dot"></span>{{ visible_count }} ظاهر{% if hidden_count %} · <span class="dot off"></span>{{ hidden_count }} مخفي{% endif %}</small></a>
+  <a class="card stat" href="/dashboard/brands/"><div class="k"><i>{% icon "brand" %}</i> العلامات</div><b class="num">{{ brands|length }}</b><small>{% for b in brands|slice:":3" %}{{ b.name_ar }}{% if not forloop.last %} · {% endif %}{% empty %}لا توجد بعد{% endfor %}</small></a>
+  <a class="card stat" href="/dashboard/categories/"><div class="k"><i>{% icon "cat" %}</i> الفئات</div><b class="num">{{ categories|length }}</b><small>{% for c in categories|slice:":4" %}{{ c.name_ar }}{% if not forloop.last %} · {% endif %}{% empty %}لا توجد بعد{% endfor %}</small></a>
+  <a class="card stat{% if new_count %} hot{% endif %}" href="/dashboard/inquiries/?status=new"><div class="k"><i>{% icon "inbox" %}</i> طلبات جديدة</div><b class="num">{{ new_count }}</b><small>{% if last_new %}آخرها {{ last_new.created_at|ago }}{% else %}لا جديد{% endif %}</small></a>
+</section>
+
+<section class="cols">
+  <div class="card">
+    <div class="hd"><h2>آخر المنتجات</h2><a class="more" href="/dashboard/products/">كل المنتجات ←</a></div>
+    <div class="bd">
+      {% if latest %}
+      <div class="minis">
+        {% for p in latest %}{% with cover=p.images.all.0 %}
+        <a class="mini" href="/dashboard/products/{{ p.id }}/"><div class="ph">{% if cover %}<img src="{{ cover.thumb.url }}" alt="" loading="lazy">{% endif %}{% if not p.is_visible %}<span class="badge">مخفي</span>{% elif p.is_featured %}<span class="badge cp">مميّز</span>{% endif %}</div><div class="tag">{{ p.brand.name_ar }}</div><h3>{{ p.name_ar }}</h3></a>
+        {% endwith %}{% endfor %}
+      </div>
+      {% else %}
+      <div class="empty"><span class="ic">{% icon "prod" %}</span><b>لا منتجات بعد</b><span>ابدأ بإضافة علامة، ثم أضف منتجاتها.</span><a class="btn pri" href="/dashboard/{% if brands %}products{% else %}brands{% endif %}/new/">{% icon "plus" %} {% if brands %}منتج جديد{% else %}علامة جديدة{% endif %}</a></div>
+      {% endif %}
+      {% if no_photos %}<div class="alert">{% icon "alert" %} {% if no_photos == 1 %}منتج واحد بلا صور{% elif no_photos == 2 %}منتجان بلا صور{% else %}{{ no_photos }} منتجات بلا صور{% endif %}، لن {% if no_photos == 1 %}يظهر{% else %}تظهر{% endif %} بشكل جيد في المعرض.<a href="/dashboard/products/?status=nophotos">أكمل الصور</a></div>{% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="hd"><h2>طلبات الشراكة</h2><a class="more" href="/dashboard/inquiries/">الكل ←</a></div>
+    <div class="bd">
+      {% if inquiries %}
+      <ul class="inq">
+        {% for i in inquiries %}
+        <li><a class="who" href="/dashboard/inquiries/{{ i.id }}/"><b>{{ i.company }}</b><span>{{ i.name }}{% if i.city or i.country %} · {{ i.city|default:i.country }}{% endif %} · {{ i.created_at|ago }}</span></a><span class="pill{% if i.status == 'new' %} new{% elif i.status == 'contacted' %} ok{% endif %}">{{ i.get_status_display }}</span><a class="iconbtn wa" href="https://wa.me/{{ i.phone|wa }}" target="_blank" rel="noopener" title="واتساب">{% icon "wa" %}</a></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <div class="empty"><span class="ic">{% icon "inbox" %}</span><b>لا طلبات بعد</b><span>تصل هنا طلبات نموذج الشراكة في الموقع.</span></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

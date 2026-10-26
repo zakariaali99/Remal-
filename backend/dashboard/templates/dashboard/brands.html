@@ -1,0 +1,28 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}العلامات{% endblock %}{% block mtitle %}العلامات{% endblock %}
+{% block body %}
+<div class="top">
+  <div><h1>العلامات</h1><div class="sub">العلامات التي توزّعها رمال. كل منتج يتبع علامة.</div></div>
+  <div class="grow"></div>
+  <a class="btn pri" href="/dashboard/brands/new/">{% icon "plus" %} علامة جديدة</a>
+</div>
+{% if items %}
+<div class="card" style="overflow:hidden">
+  <ul class="rows" data-sortable="/dashboard/brands/order/">
+    {% for b in items %}
+    <li data-id="{{ b.id }}">
+      <span class="grip" title="اسحب لتغيير الترتيب">{% icon "grip" %}</span>
+      <span class="lg">{% if b.logo %}<img src="{{ b.logo.url }}" alt="">{% else %}{{ b.name_ar|slice:":1" }}{% endif %}</span>
+      <a class="who" href="/dashboard/brands/{{ b.id }}/"><b>{{ b.name_ar }} <bdi class="en">{{ b.name_en }}</bdi></b><span>{{ b.tagline_ar|default:"—" }}</span></a>
+      <a class="n" href="/dashboard/products/?brand={{ b.id }}">{{ b.n }} منتج</a>
+      {% if b.is_visible %}<span class="pill ok">ظاهرة</span>{% else %}<span class="pill">مخفية</span>{% endif %}
+      <a class="iconbtn" href="/dashboard/brands/{{ b.id }}/" title="تعديل">{% icon "edit" %}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% if items|length > 1 %}<p class="hint-row">{% icon "grip" %} الترتيب هنا هو ترتيب العلامات في الموقع. اسحب لتغييره.</p>{% endif %}
+{% else %}
+<div class="card empty"><span class="ic">{% icon "brand" %}</span><b>لا علامات بعد</b><span>أضف رمال أو أي علامة توزّعونها، ثم أضف منتجاتها.</span><a class="btn pri" href="/dashboard/brands/new/">{% icon "plus" %} علامة جديدة</a></div>
+{% endif %}
+{% endblock %}

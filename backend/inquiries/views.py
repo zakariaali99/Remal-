@@ -34,7 +34,7 @@ def email_body(inquiry) -> str:
 @api_view(["POST"])
 @throttle_classes([ContactThrottle])
 def contact(request):
-    """POST /contact/ — the partnership form. Saved first (visible in the dashboard), then emailed."""
+    """POST /api/contact/ — the partnership form. Saved first (visible in the dashboard), then emailed."""
     if request.data.get("website"):  # honeypot: only bots fill it
         return Response({"ok": True})
     serializer = InquirySerializer(data=request.data)

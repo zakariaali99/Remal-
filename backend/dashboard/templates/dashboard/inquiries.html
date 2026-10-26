@@ -1,0 +1,38 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}طلبات الشراكة{% endblock %}{% block mtitle %}الطلبات{% endblock %}
+{% block body %}
+<div class="top">
+  <div><h1>طلبات الشراكة</h1><div class="sub">تصل من نموذج «كن شريكاً» في الموقع، وتُرسل أيضاً إلى contact@remalperfumes.ly</div></div>
+  <div class="grow"></div>
+  <a class="btn" href="/dashboard/inquiries/export/">{% icon "download" %} تنزيل Excel</a>
+</div>
+
+<form class="bar" method="get">
+  <div class="chips">{% for key, label, n in tabs %}<a href="?status={{ key }}{% if q %}&q={{ q|urlencode }}{% endif %}"{% if status == key %} class="on"{% endif %}>{{ label }} <small class="num">{{ n }}</small></a>{% endfor %}</div>
+  <label class="search">{% icon "search" %}<input type="search" name="q" value="{{ q }}" placeholder="ابحث بالشركة أو الاسم أو الهاتف" aria-label="بحث"><input type="hidden" name="status" value="{{ status }}"></label>
+</form>
+
+{% if page.object_list %}
+<div class="card" style="overflow:hidden">
+  <ul class="inq-table">
+    {% for i in page %}
+    <li{% if i.status == "new" %} class="is-new"{% endif %}><a href="/dashboard/inquiries/{{ i.id }}/">
+      <div><b>{{ i.company }}</b><span>{{ i.name }} · <bdi dir="ltr">{{ i.phone }}</bdi></span></div>
+      <div><span>{{ i.get_kind_display }}{% if i.city or i.country %} · {{ i.city|default:i.country }}{% endif %}</span></div>
+      <span class="when">{{ i.created_at|date:"j M Y" }}</span>
+      <span class="pill{% if i.status == 'new' %} new{% elif i.status == 'contacted' %} ok{% endif %}">{{ i.get_status_display }}</span>
+    </a></li>
+    {% endfor %}
+  </ul>
+</div>
+{% if page.has_other_pages %}
+<nav class="pager">
+  {% if page.has_previous %}<a class="btn sm" href="?{{ keep }}&page={{ page.previous_page_number }}">السابق</a>{% endif %}
+  <span class="num">صفحة {{ page.number }} من {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="btn sm" href="?{{ keep }}&page={{ page.next_page_number }}">التالي</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="card empty"><span class="ic">{% icon "inbox" %}</span><b>{% if q or status %}لا طلبات مطابقة{% else %}لا طلبات بعد{% endif %}</b><span>{% if q or status %}جرّب تصفية أخرى.{% else %}عندما يرسل أحد نموذج الشراكة في الموقع يظهر هنا.{% endif %}</span></div>
+{% endif %}
+{% endblock %}

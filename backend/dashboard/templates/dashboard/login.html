@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+{% include "dashboard/_head.html" %}
+<title>تسجيل الدخول · لوحة رمال</title>
+</head>
+<body>
+<div class="login">
+  <div class="art">
+    <div class="bg"></div>
+    {% include "dashboard/_mark.svg" %}
+    <div>{% include "dashboard/_word.svg" %}<p>لوحة التحكم في معرض المنتجات وطلبات الشراكة.</p></div>
+  </div>
+  <form method="post" action="/dashboard/login/">
+    {% csrf_token %}
+    <h1>أهلاً بعودتك</h1>
+    <p class="sub">سجّل الدخول لإدارة المعرض.</p>
+    {% if form.errors %}<div class="bad">اسم المستخدم أو كلمة المرور غير صحيحة.</div>{% endif %}
+    <div class="f"><label for="id_username">اسم المستخدم</label><input id="id_username" name="username" value="{{ form.username.value|default:'' }}" autocomplete="username" autocapitalize="none" required autofocus dir="ltr"></div>
+    <div class="f"><label for="id_password">كلمة المرور</label><input id="id_password" type="password" name="password" autocomplete="current-password" required dir="ltr"></div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn pri">دخول</button>
+  </form>
+</div>
+</body>
+</html>

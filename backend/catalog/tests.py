@@ -2,7 +2,6 @@ import shutil
 import tempfile
 from io import BytesIO
 
-from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from PIL import Image
@@ -46,55 +45,33 @@ class CatalogTests(TestCase):
             self.assertFalse(Image.os.path.exists(p))
 
     def test_list_localized_with_fallback(self):
-        data = self.client.get("/products/?lang=fr").json()
+        data = self.client.get("/api/products/?lang=fr").json()
         self.assertEqual(data["count"], 1)
         self.assertEqual(data["results"][0]["name"], "Scent")  # no French: English
-        data = self.client.get("/products/?lang=ar").json()
+        data = self.client.get("/api/products/?lang=ar").json()
         self.assertEqual(data["results"][0]["name"], "عطر")
 
     def test_hidden_products_and_brands_are_not_public(self):
         self.product.is_visible = False
         self.product.save()
-        self.assertEqual(self.client.get("/products/").json()["count"], 0)
-        self.assertEqual(self.client.get(f"/products/{self.product.id}/").status_code, 404)
+        self.assertEqual(self.client.get("/api/products/").json()["count"], 0)
+        self.assertEqual(self.client.get(f"/api/products/{self.product.id}/").status_code, 404)
         self.product.is_visible = True
         self.product.save()
         self.brand.is_visible = False
         self.brand.save()
-        self.assertEqual(self.client.get(f"/products/{self.product.id}/").status_code, 404)
+        self.assertEqual(self.client.get(f"/api/products/{self.product.id}/").status_code, 404)
 
     def test_filters_by_id(self):
         other = Brand.objects.create(name_ar="ب", name_en="B")
         Product.objects.create(brand=other, name_ar="x", name_en="x")
-        self.assertEqual(self.client.get(f"/products/?brand={self.brand.id}").json()["count"], 1)
-        self.assertEqual(self.client.get(f"/products/?category={self.cat.id}").json()["count"], 1)
-        self.assertEqual(self.client.get("/products/?brand=not-an-id").status_code, 400)
+        self.assertEqual(self.client.get(f"/api/products/?brand={self.brand.id}").json()["count"], 1)
+        self.assertEqual(self.client.get(f"/api/products/?category={self.cat.id}").json()["count"], 1)
+        self.assertEqual(self.client.get("/api/products/?brand=not-an-id").status_code, 400)
 
     def test_no_version_prefix(self):
-        self.assertEqual(self.client.get("/v1/products/").status_code, 404)
+        self.assertEqual(self.client.get("/api/v1/products/").status_code, 404)
 
-    def test_admin_multi_upload(self):
-        User.objects.create_superuser("boss", "b@example.com", "a-long-test-pass")
-        self.client.login(username="boss", password="a-long-test-pass")
-        url = f"/admin/catalog/product/{self.product.id}/change/"
-        form = {
-            "brand": self.brand.id, "category": self.cat.id, "name_ar": "عطر", "name_en": "Scent",
-            "size": "100 ml", "order": 0, "is_visible": "on",
-            "images-TOTAL_FORMS": 0, "images-INITIAL_FORMS": 0, "images-MIN_NUM_FORMS": 0, "images-MAX_NUM_FORMS": 1000,
-            "photos": [upload("a.jpg", fmt="JPEG"), upload("b.png", mode="RGBA")],
-        }
-        res = self.client.post(url, form)
-        self.assertEqual(res.status_code, 302, res.content[:2000])
-        self.assertEqual(list(self.product.images.values_list("order", flat=True)), [0, 1])
-
-    def test_admin_rejects_non_images(self):
-        User.objects.create_superuser("boss", "b@example.com", "a-long-test-pass")
-        self.client.login(username="boss", password="a-long-test-pass")
-        fake = SimpleUploadedFile("x.jpg", b"<?php echo 1; ?>", content_type="image/jpeg")
-        res = self.client.post(f"/admin/catalog/product/{self.product.id}/change/", {
-            "brand": self.brand.id, "name_ar": "عطر", "name_en": "Scent", "order": 0,
-            "images-TOTAL_FORMS": 0, "images-INITIAL_FORMS": 0, "images-MIN_NUM_FORMS": 0, "images-MAX_NUM_FORMS": 1000,
-            "photos": [fake],
-        })
-        self.assertEqual(res.status_code, 200)  # form shown again with an error
-        self.assertEqual(self.product.images.count(), 0)
+    def test_sitemap(self):
+        res = self.client.get("/api/sitemap.xml")
+        self.assertContains(res, f"/en/products/{self.product.id}/")

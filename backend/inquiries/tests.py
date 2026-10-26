@@ -13,7 +13,7 @@ class ContactTests(TestCase):
         cache.clear()
 
     def post(self, data):
-        return self.client.post("/contact/", data, content_type="application/json")
+        return self.client.post("/api/contact/", data, content_type="application/json")
 
     def test_saved_and_emailed_without_empty_lines(self):
         res = self.post(GOOD)
@@ -44,7 +44,3 @@ class ContactTests(TestCase):
     def test_rate_limited(self):
         codes = [self.post(GOOD).status_code for _ in range(10)]
         self.assertIn(429, codes)
-
-    def test_cors_allows_site(self):
-        res = self.client.options("/contact/", HTTP_ORIGIN="http://localhost:5173", HTTP_ACCESS_CONTROL_REQUEST_METHOD="POST")
-        self.assertEqual(res["access-control-allow-origin"], "http://localhost:5173")

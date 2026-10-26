@@ -1,0 +1,60 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}{% if is_new %}{{ singular }} جديدة{% else %}{{ obj.name_ar }}{% endif %}{% endblock %}
+{% block mtitle %}{{ plural }}{% endblock %}
+{% block body %}
+<div class="top">
+  <div><div class="crumb"><a href="/dashboard/{{ kind }}/">{{ plural }}</a><span>/</span><span>{% if is_new %}جديدة{% else %}تعديل{% endif %}</span></div><h1 id="title">{% if is_new %}{{ singular }} جديدة{% else %}{{ obj.name_ar }}{% endif %}</h1></div>
+</div>
+
+<form method="post" enctype="multipart/form-data" data-dirty novalidate>
+  {% csrf_token %}
+  <div class="ed">
+    <div class="stack">
+      {% include "dashboard/_langs.html" %}
+      {% if kind == "brands" %}
+      <section class="card">
+        <div class="bd gap">
+          <div class="f{% if form.website.errors %} bad{% endif %}"><label for="id_website">الموقع الرسمي <em>(اختياري)</em></label>{{ form.website }}{% for e in form.website.errors %}<span class="err">{{ e }}</span>{% endfor %}</div>
+        </div>
+      </section>
+      {% endif %}
+      <div class="savebar">
+        <span data-state>{% if is_new %}لم تُحفظ بعد{% else %}كل التغييرات محفوظة{% endif %}</span>
+        <a class="btn sm" href="/dashboard/{{ kind }}/">إلغاء</a>
+        <button class="btn sm pri">حفظ</button>
+      </div>
+    </div>
+    <aside>
+      {% if kind == "brands" %}
+      <section class="card">
+        <div class="hd"><h2>الشعار</h2></div>
+        <div class="bd">
+          <div class="logo-pick" data-logo>
+            <span class="lg">{% if obj.logo %}<img src="{{ obj.logo.url }}" alt="">{% else %}<span>{{ obj.name_ar|slice:":1"|default:"؟" }}</span>{% endif %}</span>
+            <div class="acts">
+              <label class="btn sm">{% icon "up" %} {% if obj.logo %}تغيير الشعار{% else %}رفع الشعار{% endif %}<input type="file" name="logo" accept="image/png,image/webp,image/jpeg,image/*" hidden></label>
+              {% if obj.logo %}<label class="check"><input type="checkbox" name="logo-clear"> إزالة الشعار</label>{% endif %}
+              <small class="hint">PNG بخلفية شفافة أفضل.</small>
+            </div>
+          </div>
+          {% for e in form.logo.errors %}<p class="err" style="margin-top:10px">{{ e }}</p>{% endfor %}
+        </div>
+      </section>
+      {% endif %}
+      <section class="card">
+        <div class="bd">
+          <label class="sw"><div><b>ظاهرة في الموقع</b><span>{% if kind == "brands" %}إخفاء العلامة يخفي كل منتجاتها{% else %}تظهر في تصفية المعرض{% endif %}</span></div>{{ form.is_visible }}</label>
+        </div>
+      </section>
+    </aside>
+  </div>
+</form>
+
+{% if not is_new %}
+<form method="post" action="/dashboard/{{ kind }}/{{ obj.id }}/delete/" class="danger" style="margin-top:28px" data-confirm="حذف {{ obj.name_ar }} نهائياً؟">
+  {% csrf_token %}
+  <div><b>حذف {{ singular }}</b><span>{% if kind == "brands" %}لا يمكن حذف علامة لها منتجات. لإخفائها مؤقتاً أطفئ «ظاهرة في الموقع».{% else %}منتجات هذه الفئة تبقى، لكن بلا فئة.{% endif %}</span></div>
+  <button class="btn sm del">{% icon "trash" %} حذف</button>
+</form>
+{% endif %}
+{% endblock %}
