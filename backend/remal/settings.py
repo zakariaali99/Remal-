@@ -97,7 +97,8 @@ if env("DB_ENGINE", "sqlite") == "mysql":
         }
     }
 else:
-    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+    # wait instead of failing when two requests write at the same moment
+    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3", "OPTIONS": {"timeout": 20}}}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
