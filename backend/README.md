@@ -10,7 +10,7 @@ static site from `~/public_html`; Django answers only the paths below.
 | `GET /api/products/?lang=&brand=<id>&category=<id>&page=` | Visible products, 24 per page |
 | `GET /api/products/<id>/?lang=` | One product with all its photos |
 | `GET /api/brands/?lang=` · `GET /api/categories/?lang=` | Filters for the gallery |
-| `POST /api/contact/` | The partnership form (saved to the dashboard, then emailed to `CONTACT_TO`) |
+| `POST /api/contact/` | The partnership form (saved to the dashboard, then emailed to `CONTACT_TO` through the server's own mail system) |
 | `GET /api/sitemap.xml` | Product pages, linked from the site's `robots.txt` |
 
 Paths never carry a version prefix. Every record is looked up by its UUID `id`.
@@ -38,34 +38,33 @@ printf 'DEBUG=1\n' > .env
 Then `npm run dev` in `site/`: Vite forwards `/api`, `/dashboard`, `/media` and `/static` to Django, as Apache does on the server.
 
 ## Server setup (once)
-Do these in order. The site keeps working the whole time; only the products gallery and the form wait for step 4.
+Do these in order. The site keeps working the whole time; only the products gallery and the form wait for step 3.
 
-1. **cPanel → Email Accounts:** make sure `no-reply@remalperfumes.ly` exists (the backend signs in to it to send mail) and `contact@` receives.
-2. **cPanel → Terminal:**
+1. **cPanel → Terminal:**
    ```bash
    git clone https://github.com/zakariaali99/Remal-.git ~/remal-src
    cp ~/remal-src/backend/.env.example ~/remal-src/backend/.env
    python3 -c "import secrets; print(secrets.token_urlsafe(50))"   # paste as SECRET_KEY
-   nano ~/remal-src/backend/.env                                   # SECRET_KEY, EMAIL_HOST_PASSWORD
+   nano ~/remal-src/backend/.env
    ```
    Check that `MEDIA_ROOT` and `STATIC_ROOT` in `.env` use your cPanel user name (`/home/<user>/public_html/...`).
-3. **cPanel → Setup Python App → Create:** Python 3.10 or newer (pick the highest), Application root `remal-src/backend`,
+2. **cPanel → Setup Python App → Create:** Python 3.10 or newer (pick the highest), Application root `remal-src/backend`,
    Application URL `remalperfumes.ly` with the path box **empty** (the domain root), Startup file `passenger_wsgi.py`, Entry point `application`.
    cPanel adds a few Passenger lines to the top of `~/public_html/.htaccess`. Leave them there: the site's `update.sh` keeps them.
-4. **Terminal:**
+3. **Terminal:**
    ```bash
    ~/remal-src/backend/update.sh
    source ~/virtualenv/remal-src/backend/*/bin/activate && cd ~/remal-src/backend && python manage.py createsuperuser
    rm -rf ~/public_html/api        # the old PHP form; /api/ now belongs to Django
    ~/remal-site/update.sh          # publish the site build that reads /api/
    ```
-5. **Check** in a browser:
+4. **Check** in a browser:
    - https://remalperfumes.ly/ and https://remalperfumes.ly/en/ still show the site (Apache serves existing files; Passenger only gets the rest).
    - https://remalperfumes.ly/api/products/ returns JSON.
    - https://remalperfumes.ly/dashboard/ shows the REMAL sign-in page.
-6. Sign in, add the brands, categories and products. They appear at https://remalperfumes.ly/products/ within a minute.
+5. Sign in, add the brands, categories and products. They appear at https://remalperfumes.ly/products/ within a minute.
 
-If step 5 shows the dashboard's 404 page instead of the home page, the host's Passenger is taking every request:
+If step 4 shows the dashboard's 404 page instead of the home page, the host's Passenger is taking every request:
 tell Libyan Spider support "Passenger at the domain root should let Apache serve existing files in public_html", or
 ask them to map only `/api` and `/dashboard` to the app.
 
