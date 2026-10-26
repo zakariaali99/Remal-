@@ -6,10 +6,10 @@ from inquiries.models import Inquiry
 
 LANG_TABS = (
     ("ar", "العربية", "rtl"),
-    ("en", "English", "ltr"),
-    ("fr", "Français", "ltr"),
-    ("zh", "中文", "ltr"),
-    ("ja", "日本語", "ltr"),
+    ("en", "الإنجليزية", "ltr"),
+    ("fr", "الفرنسية", "ltr"),
+    ("zh", "الصينية", "ltr"),
+    ("ja", "اليابانية", "ltr"),
 )
 REQUIRED_LANGS = ("ar", "en")
 LABELS = {"name": "الاسم", "tagline": "سطر تعريفي", "about": "نبذة", "family": "العائلة العطرية", "description": "الوصف"}
