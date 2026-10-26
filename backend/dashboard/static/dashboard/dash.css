@@ -344,3 +344,8 @@ html[dir=ltr] .toasts{transform:translateX(-50%)}
 .btn[aria-busy=true]{opacity:.6;pointer-events:none}
 .rows .who .en{color:var(--muted);font-weight:400;font-size:13px;margin-inline-start:6px}
 .iconbtn.del:hover{color:var(--warn);border-color:var(--warn)}
+.pw{position:relative}
+.pw input{padding-left:48px}
+.pw .eye{position:absolute;top:50%;left:6px;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:10px;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.pw .eye:hover{color:var(--copper)}
+.pw .eye[aria-pressed=true]{color:var(--copper)}

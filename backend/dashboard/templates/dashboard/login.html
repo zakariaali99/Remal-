@@ -1,4 +1,4 @@
-<!doctype html>
+{% load dash %}<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 {% include "dashboard/_head.html" %}
@@ -17,10 +17,26 @@
     <p class="sub">سجّل الدخول لإدارة المعرض.</p>
     {% if form.errors %}<div class="bad">اسم المستخدم أو كلمة المرور غير صحيحة.</div>{% endif %}
     <div class="f"><label for="id_username">اسم المستخدم</label><input id="id_username" name="username" value="{{ form.username.value|default:'' }}" autocomplete="username" autocapitalize="none" required autofocus dir="ltr"></div>
-    <div class="f"><label for="id_password">كلمة المرور</label><input id="id_password" type="password" name="password" autocomplete="current-password" required dir="ltr"></div>
+    <div class="f"><label for="id_password">كلمة المرور</label>
+      <div class="pw"><input id="id_password" type="password" name="password" autocomplete="current-password" required dir="ltr"><button type="button" class="eye" aria-label="إظهار كلمة المرور" aria-pressed="false" hidden>{% icon "eye" %}</button></div>
+    </div>
     <input type="hidden" name="next" value="{{ next }}">
     <button class="btn pri">دخول</button>
   </form>
 </div>
+<script>
+// show or hide the password while typing it
+(() => {
+  const input = document.getElementById('id_password'), btn = input.nextElementSibling
+  btn.hidden = false
+  btn.addEventListener('click', () => {
+    const show = input.type === 'password'
+    input.type = show ? 'text' : 'password'
+    btn.setAttribute('aria-pressed', show)
+    btn.setAttribute('aria-label', show ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور')
+    input.focus()
+  })
+})()
+</script>
 </body>
 </html>
