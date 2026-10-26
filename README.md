@@ -6,31 +6,33 @@ It is Arabic-first and also comes in English, French, Chinese and Japanese. The 
 ```
 remal/
 ├── brand/            official logo extracted as SVG + brand images (source: logo PDF from the client)
+├── backend/          the API + dashboard (Django) at api.remalperfumes.ly: products, brands, enquiries. See backend/README.md
 └── site/             the website (Vite + React + Tailwind, pre-rendered to static HTML)
     ├── src/
     │   ├── App.tsx               page structure (all sections)
-    │   ├── components/           LangMenu, PartnerForm, ui helpers
+    │   ├── components/           LangMenu, PartnerForm, Products (gallery + single product), ui helpers
+    │   ├── lib/api.ts            API address (VITE_API) and response types
     │   ├── i18n/{ar,en,fr,zh,ja}.json   ALL site text, one file per language
     │   ├── lib/brand.tsx         logo components (generated from brand/*.svg)
     │   ├── lib/libya.ts          map outline + Misrata pin
     │   ├── motion.ts             sand intro + scroll animation (GSAP, Lenis)
     │   └── styles.css            brand tokens + styles
     ├── public/
-    │   ├── api/contact.php       partnership form → email + CSV backup
-    │   ├── api/config.example.php
-    │   └── .htaccess             HTTPS, caching, security headers
+    │   └── .htaccess             HTTPS, caching, security headers, /products/<id>/ rewrite
     └── scripts/prerender.mjs     renders each language to static HTML
 ```
 
 ## Editing text
 All text lives in `site/src/i18n/*.json`. Change it there, then rebuild. Keep the same keys in all five files.
 Arabic is the default page (`/`). The other languages live under `/en/`, `/fr/`, `/zh/` and `/ja/`.
+Each language also has a products page (`/products/`, `/en/products/` …). A single product is `/products/<id>/`, served by the
+same page through the `.htaccess` rewrite. Products, brands and photos are managed in the dashboard, not in these files.
 
 ## Develop and build
 ```bash
 cd site
 npm install
-npm run dev        # http://localhost:5173 (the form is stubbed locally because PHP isn't installed)
+npm run dev        # http://localhost:5173 (talks to the local API at VITE_API, see backend/README.md)
 npm run build      # outputs site/dist (all 5 languages + sitemap.xml)
 npm run typecheck
 ```
@@ -45,31 +47,27 @@ The server can't build (no Node), so the ready-built site lives on the **`produc
 - **On the server, first time (cPanel Terminal):**
   ```bash
   cd ~ && git clone -b production https://github.com/zakariaali99/Remal-.git remal-site && ~/remal-site/update.sh
-  cp ~/public_html/api/config.example.php ~/public_html/api/config.php
   ```
-- **Every update:** run `~/remal-site/update.sh`. It pulls and copies into `~/public_html`, never touching `api/config.php`, `.well-known/` or `cgi-bin/`.
+- **Every update:** run `~/remal-site/update.sh`. It pulls and copies into `~/public_html`, never touching `.well-known/` or `cgi-bin/`.
+- **The API** (products, dashboard, form) deploys separately: `~/remal-src/backend/update.sh`. See `backend/README.md`.
   You can also use cPanel → *Git Version Control* → *Deploy HEAD Commit*, which runs `.cpanel.yml`.
 
 ## Alternative: automatic deploys (GitHub Actions / FTPS)
 Every push to `main` builds the site on GitHub (`.github/workflows/deploy.yml`) and syncs `site/dist/` into
 `/home/remalper/public_html` over SSH with rsync. No Node or React server is needed on the host: the output is
-plain HTML/CSS/JS, and the only server code is `api/contact.php`, which runs on cPanel's PHP.
+plain HTML/CSS/JS. All server code is the Django API in `backend/`.
 
 ### One-time setup (Libyan Spider: external SSH is closed and the server has no rsync, so we deploy over **FTPS**)
 1. **cPanel → FTP Accounts:** create `deploy@remalperfumes.ly` with **Directory = `public_html`** and a strong password.
-2. **cPanel once:** run AutoSSL (SSL/TLS Status), create `contact@` and `no-reply@remalperfumes.ly` (Email Accounts), and set PHP 8.1+ (MultiPHP Manager).
+2. **cPanel once:** run AutoSSL (SSL/TLS Status), create `contact@` and `no-reply@remalperfumes.ly` (Email Accounts). The API (`backend/`) also needs `api.remalperfumes.ly`, see backend/README.md.
 3. **Deploy from the Mac:** create `remal/.deploy.env` (gitignored):
    ```
    FTP_HOST=ftp.remalperfumes.ly
    FTP_USER=deploy@remalperfumes.ly
    FTP_PASS=...
    ```
-   then run `./deploy.sh`. It builds, checks, and mirrors `site/dist` over FTPS (TLS). It removes stale build files, but never touches `api/config.php`, `.well-known/` or `cgi-bin/`.
-4. **Form config, once, after the first deploy** (cPanel Terminal):
-   ```bash
-   cp ~/public_html/api/config.example.php ~/public_html/api/config.php
-   ```
-5. **GitHub Actions (automatic deploys):** once the GitHub account's billing lock is lifted, add the repo secrets `FTP_SERVER=ftp.remalperfumes.ly`, `FTP_USERNAME` and `FTP_PASSWORD`. Every push to `main` then deploys automatically. The SSH path in the workflow only activates if `SSH_HOST` is set, which won't happen unless Libyan Spider opens SSH.
+   then run `./deploy.sh`. It builds, checks, and mirrors `site/dist` over FTPS (TLS). It removes stale build files, but never touches `.well-known/` or `cgi-bin/`.
+4. **GitHub Actions (automatic deploys):** once the GitHub account's billing lock is lifted, add the repo secrets `FTP_SERVER=ftp.remalperfumes.ly`, `FTP_USERNAME` and `FTP_PASSWORD`. Every push to `main` then deploys automatically. The SSH path in the workflow only activates if `SSH_HOST` is set, which won't happen unless Libyan Spider opens SSH.
 
 Without secrets, each run still builds the site and attaches it as an artifact (`remal-site-<sha>`) for manual upload through File Manager.
 

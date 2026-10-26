@@ -2,6 +2,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
 import Lenis from 'lenis'
+import type { PageName } from './App'
 import type { Lang } from './i18n'
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
@@ -21,14 +22,14 @@ function splitLines(el: Element) {
   })
 }
 
-export function initMotion(lang: Lang): () => void {
+export function initMotion(lang: Lang, page: PageName = 'home'): () => void {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches
   const hdr = $('#hdr')
   const onScroll = () => hdr.classList.toggle('scrolled', scrollY > 20)
   addEventListener('scroll', onScroll, { passive: true })
 
-  const replay = $('#replay')
-  replay.onclick = () => {
+  const replay = document.querySelector<HTMLElement>('#replay')
+  if (replay) replay.onclick = () => {
     const u = new URL(location.href); u.searchParams.delete('nointro')
     location.href = u.pathname + u.search
   }
@@ -52,8 +53,9 @@ export function initMotion(lang: Lang): () => void {
   document.addEventListener('click', anchorClick)
 
   ctx.add(() => {
-    scrollMotion(lang)
     cursor()
+    if (page !== 'home') return // the products page has no intro, hero or scroll scenes
+    scrollMotion(lang)
     if (document.documentElement.classList.contains('no-intro')) heroIn()
     else runIntro(lang).then(() => ScrollTrigger.refresh())
   })
@@ -143,10 +145,8 @@ function cursor() {
   const xTo = gsap.quickTo(c, 'x', { duration: 0.35, ease: 'power3' })
   const yTo = gsap.quickTo(c, 'y', { duration: 0.35, ease: 'power3' })
   addEventListener('pointermove', (e) => { c.style.opacity = '1'; xTo(e.clientX); yTo(e.clientY) })
-  $$('a,button,.tile').forEach((el) => {
-    el.addEventListener('mouseenter', () => c.classList.add('big'))
-    el.addEventListener('mouseleave', () => c.classList.remove('big'))
-  })
+  // delegated, so elements rendered later (product cards) work too
+  addEventListener('pointerover', (e) => c.classList.toggle('big', !!(e.target as Element).closest?.('a,button,.tile')))
 }
 
 /* INTRO: sand drifts in from the reading-start side and settles into the mark, bottom first */

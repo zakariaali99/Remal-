@@ -11,8 +11,19 @@ export const markLangSwitch = (e: { currentTarget: HTMLAnchorElement }) => {
   } catch { /* storage blocked: device language keeps deciding */ }
 }
 
+// the part of the address after the language prefix (e.g. "products/<id>/"), so switching language keeps the page
+function usePageSuffix(lang: Lang) {
+  const [rest, setRest] = useState('')
+  useEffect(() => {
+    const prefix = LANGS[lang].path
+    if (location.pathname.startsWith(prefix)) setRest(location.pathname.slice(prefix.length))
+  }, [lang])
+  return rest
+}
+
 export function LangMenu({ lang, label }: { lang: Lang; label: string }) {
   const [open, setOpen] = useState(false)
+  const rest = usePageSuffix(lang)
   const root = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -42,7 +53,7 @@ export function LangMenu({ lang, label }: { lang: Lang; label: string }) {
       <ul aria-label={label}>
         {LANG_CODES.map((c) => (
           <li key={c}>
-            <a href={LANGS[c].path} lang={c} hrefLang={c} aria-current={c === lang} onClick={markLangSwitch}>{LANGS[c].native}</a>
+            <a href={LANGS[c].path + rest} lang={c} hrefLang={c} aria-current={c === lang} onClick={markLangSwitch}>{LANGS[c].native}</a>
           </li>
         ))}
       </ul>
@@ -51,10 +62,11 @@ export function LangMenu({ lang, label }: { lang: Lang; label: string }) {
 }
 
 export function LangList({ lang }: { lang: Lang }) {
+  const rest = usePageSuffix(lang)
   return (
     <div className="langs">
       {LANG_CODES.map((c) => (
-        <a key={c} href={LANGS[c].path} lang={c} hrefLang={c} aria-current={c === lang} onClick={markLangSwitch}>{LANGS[c].native}</a>
+        <a key={c} href={LANGS[c].path + rest} lang={c} hrefLang={c} aria-current={c === lang} onClick={markLangSwitch}>{LANGS[c].native}</a>
       ))}
     </div>
   )

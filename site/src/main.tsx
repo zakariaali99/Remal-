@@ -7,4 +7,5 @@ const htmlLang = document.documentElement.lang as Lang
 const lang: Lang = LANG_CODES.includes(htmlLang) ? htmlLang : 'ar'
 // each page ships only its own dictionary, embedded by the pre-renderer
 const dict = JSON.parse(document.getElementById('__dict')!.textContent!) as Dict
-hydrateRoot(document.getElementById('root')!, <App lang={lang} dict={dict} />)
+const page = /\/products\//.test(location.pathname) ? 'products' : 'home'
+hydrateRoot(document.getElementById('root')!, <App lang={lang} dict={dict} page={page} />)

@@ -5,7 +5,7 @@ set -eu
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 (cd site && npm run typecheck && npm run build)
-for f in index.html en/index.html fr/index.html zh/index.html ja/index.html api/contact.php .htaccess; do
+for f in index.html en/index.html fr/index.html zh/index.html ja/index.html products/index.html en/products/index.html .htaccess; do
   [ -f "site/dist/$f" ] || { echo "missing site/dist/$f"; exit 1; }
 done
 

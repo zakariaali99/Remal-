@@ -4,23 +4,26 @@ import { Mark, Wordmark } from './lib/brand'
 import { GRID_X, GRID_Y, HUBS, MAP_H, MAP_W, OUTLINE_POINTS, ROUTE } from './lib/libya'
 import { LangList, LangMenu } from './components/LangMenu'
 import { PartnerForm } from './components/PartnerForm'
+import { ProductsPage } from './components/Products'
+import { EMAIL, FACEBOOK, PHONE_SHOW, PHONE_TEL, whatsapp } from './lib/contact'
 import { Arrow, Dune, Html } from './components/ui'
 import { initMotion, lenisStop, lenisStart } from './motion'
 
-const NAV = [['#about', 'nav.about'], ['#brands', 'nav.brands'], ['#portfolio', 'nav.portfolio'], ['#network', 'nav.network'], ['#partner', 'nav.partner'], ['#contact', 'nav.contact']] as const
-const FACEBOOK = 'https://www.facebook.com/share/1CmyoEmRdq/'
-const PHONE_TEL = '+218915096111'
-const PHONE_SHOW = '+218 91 509 6111'
-const WHATSAPP = `https://wa.me/${PHONE_TEL.slice(1)}`
-const EMAIL = 'contact@remalperfumes.ly'
+const NAV = [['#about', 'nav.about'], ['#brands', 'nav.brands'], ['products/', 'nav.products'], ['#network', 'nav.network'], ['#partner', 'nav.partner'], ['#contact', 'nav.contact']] as const
 
-export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
+export type PageName = 'home' | 'products'
+
+export default function App({ lang, dict, page = 'home' }: { lang: Lang; dict: Dict; page?: PageName }) {
   const t = makeT(dict)
+  const home = LANGS[lang].path
+  // section links stay in-page on the home page and point back to it from the other pages
+  const to = (href: string) => (page === 'home' && href.startsWith('#') ? href : `${home}${href}`)
+  const current = (href: string) => (page === 'products' && href === 'products/' ? 'page' : undefined)
   const [drawer, setDrawer] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
   const burgerRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => initMotion(lang), [lang])
+  useEffect(() => initMotion(lang, page), [lang, page])
 
   // drawer: lock scroll, focus trap, Escape
   useEffect(() => {
@@ -44,7 +47,7 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
 
   return (
     <>
-      <div id="intro" aria-hidden="true">
+      {page === 'home' && <div id="intro" aria-hidden="true">
         <canvas id="sand" />
         <div className="lock">
           <div className="imark" id="imark"><Mark /></div>
@@ -52,7 +55,7 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
           <div className="ital">{t('intro.tag')}</div>
         </div>
         <div className="count" id="count">00</div>
-      </div>
+      </div>}
 
       <div className="cur" id="cur" />
       <a className="skip-link" href="#main">{t('skip')}</a>
@@ -63,11 +66,11 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
             <span className="m" id="hmark"><Mark /></span><span className="w" id="hword"><Wordmark /></span>
           </a>
           <nav className="menu" aria-label="Main">
-            {NAV.map(([href, k]) => <a key={href} href={href}>{t(k)}</a>)}
+            {NAV.map(([href, k]) => <a key={href} href={to(href)} aria-current={current(href)}>{t(k)}</a>)}
           </nav>
           <div className="nav-r">
             <LangMenu lang={lang} label={t('lang.label')} />
-            <a href="#partner" className="btn solid">{t('cta.partner')}</a>
+            <a href={to('#partner')} className="btn solid">{t('cta.partner')}</a>
             <button ref={burgerRef} className="burger" aria-label="Menu" aria-expanded={drawer} aria-controls="drawer" onClick={() => setDrawer(true)}>
               <span /><span /><span />
             </button>
@@ -82,13 +85,14 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
             <span className="brand"><span className="m" style={{ height: 40 }}><Mark /></span></span>
             <button className="close" aria-label="Close" onClick={() => setDrawer(false)}>×</button>
           </div>
-          <nav>{NAV.map(([href, k]) => <a key={href} href={href} onClick={() => setDrawer(false)}>{t(k)}</a>)}</nav>
+          <nav>{NAV.map(([href, k]) => <a key={href} href={to(href)} aria-current={current(href)} onClick={() => setDrawer(false)}>{t(k)}</a>)}</nav>
           <LangList lang={lang} />
-          <a href="#partner" className="btn solid" onClick={() => setDrawer(false)}>{t('cta.partner')}</a>
+          <a href={to('#partner')} className="btn solid" onClick={() => setDrawer(false)}>{t('cta.partner')}</a>
         </div>
       </div>
 
       <main id="main" tabIndex={-1}>
+        {page === 'products' ? <ProductsPage lang={lang} t={t} /> : <>
         <section className="hero">
           <div className="ghostmark" aria-hidden="true"><Mark /></div>
           <div className="wrap hero-grid">
@@ -170,6 +174,7 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
           <div className="wrap">
             <div className="pf-head">
               <div><div className="eyebrow" data-rv>{t('pf.eyebrow')}</div><Html as="h2" data-split html={t('pf.h2')} /></div>
+              <a href={to('products/')} className="link" data-rv>{t('pf.browse')}</a>
             </div>
             <div className="pf">
               <div className="tile big" data-clip>
@@ -232,29 +237,30 @@ export default function App({ lang, dict }: { lang: Lang; dict: Dict }) {
             <PartnerForm lang={lang} t={t} dict={dict} />
           </div>
         </section>
+        </>}
       </main>
 
       <footer id="contact">
         <div className="wrap">
           <div className="ft-top">
             <div className="ft-brand"><p>{t('ft.line')}</p></div>
-            <div><h4>{t('ft.co')}</h4>{NAV.slice(0, 4).map(([href, k]) => <a key={href} href={href}>{t(k)}</a>)}</div>
+            <div><h4>{t('ft.co')}</h4>{NAV.slice(0, 4).map(([href, k]) => <a key={href} href={to(href)}>{t(k)}</a>)}</div>
             <div>
               <h4>{t('ft.contact')}</h4>
               <ul><li>{t('ft.addr')}</li></ul>
               <span className="ft-lbl">{t('ft.support')}</span>
               <a href={`tel:${PHONE_TEL}`} dir="ltr" className="ft-ltr">{PHONE_SHOW}</a>
               <a href={`mailto:${EMAIL}`} dir="ltr" className="ft-ltr">{EMAIL}</a>
-              <a href="#partner">{t('ft.form')}</a>
+              <a href={to('#partner')}>{t('ft.form')}</a>
             </div>
             <div><h4>{t('ft.follow')}</h4><a href={FACEBOOK} target="_blank" rel="noopener">{t('ft.fb')}</a></div>
           </div>
           <div className="ft-word" aria-hidden="true"><Wordmark /></div>
-          <div className="ft-bot"><span>{t('ft.copy')}</span><button className="replay" id="replay">{t('ft.replay')}</button></div>
+          <div className="ft-bot"><span>{t('ft.copy')}</span>{page === 'home' && <button className="replay" id="replay">{t('ft.replay')}</button>}</div>
         </div>
       </footer>
 
-      <a className="wa" href={WHATSAPP} target="_blank" rel="noopener" aria-label={t('wa.label')} title={t('wa.label')}>
+      <a className="wa" href={whatsapp()} target="_blank" rel="noopener" aria-label={t('wa.label')} title={t('wa.label')}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.2-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.05 21.8h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.9-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.89 9.88zm8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.41z"/></svg>
       </a>
     </>

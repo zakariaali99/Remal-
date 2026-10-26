@@ -18,13 +18,17 @@
     var want=localStorage.getItem('remal-lang');
     if(!P[want]){want='en';var L=navigator.languages||[navigator.language];
       for(var i=0;i<L.length;i++){var c=String(L[i]||'').slice(0,2).toLowerCase();if(P[c]){want=c;break}}}
-    if(want!==here){location.replace(P[want]+location.search+location.hash);document.documentElement.style.visibility='hidden'}
+    // keep the same page (e.g. products/<id>/) when switching to the device language
+    var cur=P[here]||'/',rest=location.pathname.indexOf(cur)===0?location.pathname.slice(cur.length):'';
+    if(want!==here){location.replace(P[want]+rest+location.search+location.hash);document.documentElement.style.visibility='hidden'}
   }catch(e){}})();
   // intro plays on every load; skipped only for reduced motion, ?nointro (QA), or right after a language switch
   (function(){var q=new URLSearchParams(location.search),once=false;
   try{once=sessionStorage.getItem('remal-skip-intro-once')==='1';sessionStorage.removeItem('remal-skip-intro-once')}catch(e){}
   if(once||q.has('nointro')||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('no-intro');
-  document.documentElement.classList.add('js');})();
+  document.documentElement.classList.add('js');
+  // a single product (products/<id>/) shares the gallery page; hide the gallery heading before first paint
+  if(/\/products\/[0-9a-f-]{36}\/?$/i.test(location.pathname))document.documentElement.classList.add('pr-detail');})();
 </script>
 </head>
 <body>

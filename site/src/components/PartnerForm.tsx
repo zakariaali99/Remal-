@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react'
 import type { Dict, Key, Lang } from '../i18n'
+import { API } from '../lib/api'
 import { Arrow } from './ui'
 
 type Tab = 'brand' | 'retail'
@@ -51,7 +52,7 @@ export function PartnerForm({ lang, t, dict }: { lang: Lang; t: (k: Key) => stri
     setStatus('sending')
     try {
       const city = v.city === 'other' ? v.otherCity : dict[`c.${v.city as Hub}`]
-      const res = await fetch('/api/contact.php', {
+      const res = await fetch(`${API}/contact/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind: tab, lang, website, ...v, city: tab === 'retail' ? city : '', country: tab === 'brand' ? v.country : '' }),

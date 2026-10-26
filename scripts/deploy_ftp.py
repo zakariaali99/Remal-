@@ -3,7 +3,7 @@
 
 Reads FTP_HOST, FTP_USER, FTP_PASS and optionally FTP_DIR from ../.deploy.env (gitignored).
 Uploads every built file, then removes stale files from the folders the build owns
-(assets/, img/, en/, fr/, zh/, ja/). Never touches api/config.php, .well-known/ or cgi-bin/.
+(assets/, img/, products/, en/, fr/, zh/, ja/). Never touches .well-known/ or cgi-bin/.
 """
 import ftplib
 import os
@@ -12,8 +12,8 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DIST = ROOT / "site" / "dist"
-OWNED_DIRS = ["assets", "img", "en", "fr", "zh", "ja"]
-NEVER_TOUCH = {"api/config.php"}
+OWNED_DIRS = ["assets", "img", "products", "en", "fr", "zh", "ja"]
+NEVER_TOUCH: set[str] = set()
 
 
 def load_env():
