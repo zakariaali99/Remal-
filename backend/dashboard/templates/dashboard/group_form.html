@@ -51,9 +51,9 @@
 </form>
 
 {% if not is_new %}
-<form method="post" action="/dashboard/{{ kind }}/{{ obj.id }}/delete/" class="danger" style="margin-top:28px" data-confirm="حذف {{ obj.name_ar }} نهائياً؟">
+<form method="post" action="/dashboard/{{ kind }}/{{ obj.id }}/delete/" class="danger" style="margin-top:28px" data-confirm="حذف {{ obj.name_ar }}{% if kind == 'brands' and obj.products.count %} مع منتجاتها ({{ obj.products.count }}) وكل صورها{% endif %} نهائياً؟ لا يمكن التراجع.">
   {% csrf_token %}
-  <div><b>حذف {{ singular }}</b><span>{% if kind == "brands" %}لا يمكن حذف علامة لها منتجات. لإخفائها مؤقتاً أطفئ «ظاهرة في الموقع».{% else %}منتجات هذه الفئة تبقى، لكن بلا فئة.{% endif %}</span></div>
+  <div><b>حذف {{ singular }}</b><span>{% if kind == "brands" %}تُحذف العلامة مع كل منتجاتها وصورها، ولا يمكن التراجع. لإخفائها مؤقتاً أطفئ «ظاهرة في الموقع» بدلاً من الحذف.{% else %}منتجات هذه الفئة تبقى، لكن بلا فئة.{% endif %}</span></div>
   <button class="btn sm del">{% icon "trash" %} حذف</button>
 </form>
 {% endif %}

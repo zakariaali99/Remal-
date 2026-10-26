@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import tempfile
 
@@ -99,10 +100,14 @@ class DashboardTests(TestCase):
         self.client.post("/dashboard/brands/order/", json.dumps({"ids": [str(new.id), str(self.brand.id)]}), content_type="application/json")
         self.assertEqual(list(Brand.objects.values_list("name_en", flat=True)), ["Almajed", "REMAL"])
 
-    def test_brand_with_products_is_not_deleted(self):
-        Product.objects.create(brand=self.brand, name_ar="عطر", name_en="Scent")
+    def test_deleting_a_brand_removes_its_products_and_photos(self):
+        p = Product.objects.create(brand=self.brand, name_ar="عطر", name_en="Scent")
+        img = ProductImage.objects.create(product=p, image=upload())
+        path = img.image.path
         self.client.post(f"/dashboard/brands/{self.brand.id}/delete/")
-        self.assertTrue(Brand.objects.filter(id=self.brand.id).exists())
+        self.assertFalse(Brand.objects.exists())
+        self.assertFalse(Product.objects.exists())
+        self.assertFalse(os.path.exists(path))
 
     def test_deleting_a_category_keeps_its_products(self):
         c = Category.objects.create(name_ar="عود", name_en="Oud")

@@ -343,3 +343,4 @@ html[dir=ltr] .toasts{transform:translateX(-50%)}
 @media (hover:none){.photo .x{opacity:1}}
 .btn[aria-busy=true]{opacity:.6;pointer-events:none}
 .rows .who .en{color:var(--muted);font-weight:400;font-size:13px;margin-inline-start:6px}
+.iconbtn.del:hover{color:var(--warn);border-color:var(--warn)}

@@ -120,11 +120,14 @@ def group_edit(request, kind, pk=None):
 def group_delete(request, kind, pk):
     model = ORDERED[kind][0]
     obj = get_object_or_404(model, pk=pk)
-    if kind == "brands" and obj.products.exists():
-        messages.error(request, f"لا يمكن حذف {obj.name_ar} لأن لها منتجات. احذف منتجاتها أو انقلها لعلامة أخرى أولاً.")
-        return redirect(f"/dashboard/brands/{obj.id}/")
-    obj.delete()  # a category's products stay, without a category
-    messages.success(request, f"تم حذف {obj.name_ar}.")
+    with transaction.atomic():
+        removed = 0
+        if kind == "brands":  # a brand goes with its products (the page asked first, with the count)
+            removed = obj.products.count()
+            for product in obj.products.all():
+                product.delete()  # one by one, so their photo files are removed too
+        obj.delete()  # a category's products stay, without a category
+    messages.success(request, f"تم حذف {obj.name_ar}" + (f" و{removed} منتج." if removed else "."))
     return redirect(f"/dashboard/{kind}/")
 
 

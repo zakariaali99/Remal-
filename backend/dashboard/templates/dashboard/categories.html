@@ -16,6 +16,7 @@
       <a class="n" href="/dashboard/products/?category={{ c.id }}">{{ c.n }} منتج</a>
       {% if c.is_visible %}<span class="pill ok">ظاهرة</span>{% else %}<span class="pill">مخفية</span>{% endif %}
       <a class="iconbtn" href="/dashboard/categories/{{ c.id }}/" title="تعديل">{% icon "edit" %}</a>
+      <form method="post" action="/dashboard/categories/{{ c.id }}/delete/" data-confirm="حذف فئة {{ c.name_ar }}؟{% if c.n %} منتجاتها ({{ c.n }}) تبقى في المعرض بلا فئة.{% endif %}">{% csrf_token %}<button class="iconbtn del" title="حذف">{% icon "trash" %}</button></form>
     </li>
     {% endfor %}
   </ul>

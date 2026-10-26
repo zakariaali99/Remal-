@@ -17,6 +17,7 @@
       <a class="n" href="/dashboard/products/?brand={{ b.id }}">{{ b.n }} منتج</a>
       {% if b.is_visible %}<span class="pill ok">ظاهرة</span>{% else %}<span class="pill">مخفية</span>{% endif %}
       <a class="iconbtn" href="/dashboard/brands/{{ b.id }}/" title="تعديل">{% icon "edit" %}</a>
+      <form method="post" action="/dashboard/brands/{{ b.id }}/delete/" data-confirm="حذف {{ b.name_ar }}{% if b.n %} مع منتجاتها ({{ b.n }}) وكل صورها{% endif %} نهائياً؟ لا يمكن التراجع.">{% csrf_token %}<button class="iconbtn del" title="حذف">{% icon "trash" %}</button></form>
     </li>
     {% endfor %}
   </ul>
