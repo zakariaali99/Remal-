@@ -9,6 +9,7 @@ export type Brand = Ref & { name_ar: string; name_en: string; tagline: string; a
 export type Category = Ref & { product_count: number }
 export type ProductCard = { id: string; name: string; family: string; size: string; is_featured: boolean; brand: Ref; category: Ref | null; cover: Photo | null }
 export type Product = Omit<ProductCard, 'brand'> & { brand: Brand; description: string; sku: string; images: Photo[] }
+export type Partner = { id: string; name: string; logo: string | null; website: string }
 export type Page<T> = { count: number; next: string | null; results: T[] }
 
 export class NotFound extends Error {}

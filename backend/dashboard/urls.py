@@ -18,7 +18,7 @@ urlpatterns = [
     path("inquiries/<uuid:pk>/", views.inquiry),
 ]
 
-for kind in ("brands", "categories"):
+for kind in ("brands", "categories", "partners"):
     urlpatterns += [
         path(f"{kind}/", views.group_list, {"kind": kind}),
         path(f"{kind}/new/", views.group_edit, {"kind": kind}),

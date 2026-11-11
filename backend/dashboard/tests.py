@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 
-from catalog.models import Brand, Category, Product, ProductImage
+from catalog.models import Brand, Category, Partner, Product, ProductImage
 from catalog.tests import upload
 from inquiries.models import Inquiry
 
@@ -49,7 +49,7 @@ class DashboardTests(TestCase):
                     "/dashboard/products/?status=nophotos&q=x", "/dashboard/brands/", "/dashboard/brands/new/",
                     f"/dashboard/brands/{self.brand.id}/", "/dashboard/categories/", f"/dashboard/categories/{c.id}/",
                     "/dashboard/inquiries/", "/dashboard/inquiries/?status=new", f"/dashboard/inquiries/{i.id}/",
-                    "/dashboard/password/"):
+                    "/dashboard/password/", "/dashboard/partners/", "/dashboard/partners/new/", "/dashboard/products/?status=home"):
             self.assertEqual(self.client.get(url).status_code, 200, url)
         self.assertContains(self.client.get(f"/dashboard/inquiries/{i.id}/"), "https://wa.me/218915096111")
 
@@ -131,3 +131,26 @@ class DashboardTests(TestCase):
             self.client.post("/dashboard/login/", {"username": "team", "password": "wrong"})
         res = self.client.post("/dashboard/login/", {"username": "team", "password": PASSWORD})
         self.assertEqual(res.status_code, 429)
+
+    def test_partner_with_logo_link_and_delete(self):
+        self.client.post("/dashboard/partners/new/", {"name_ar": "مخازن الواحة", "name_en": "Oasis Stores", "website": "https://oasis.ly",
+                                                      "is_visible": "on", "logo": upload("p.png", mode="RGBA")})
+        partner = Partner.objects.get()
+        self.assertTrue(partner.logo.name.endswith(".webp"))
+        self.assertEqual(self.client.get(f"/dashboard/partners/{partner.id}/").status_code, 200)
+        data = self.client.get("/api/partners/?lang=en").json()
+        self.assertEqual([(p["name"], p["website"]) for p in data], [("Oasis Stores", "https://oasis.ly")])
+        self.assertTrue(data[0]["logo"].endswith(".webp"))
+        path = partner.logo.path
+        self.client.post(f"/dashboard/partners/{partner.id}/delete/")
+        self.assertFalse(Partner.objects.exists())
+        self.assertFalse(os.path.exists(path))
+
+    def test_home_arch_lists_chosen_products_with_photos(self):
+        chosen = Product.objects.create(brand=self.brand, name_ar="عطر", name_en="Scent", on_home=True)
+        ProductImage.objects.create(product=chosen, image=upload())
+        Product.objects.create(brand=self.brand, name_ar="بلا صور", name_en="No photo", on_home=True)
+        Product.objects.create(brand=self.brand, name_ar="آخر", name_en="Other")
+        self.client.post(f"/dashboard/products/{chosen.id}/", product_form(self.brand, on_home="on"))
+        ids = [p["id"] for p in self.client.get("/api/products/?home=1").json()["results"]]
+        self.assertEqual(ids, [str(chosen.id)])

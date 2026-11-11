@@ -17,6 +17,7 @@
       <option value="visible"{% if status == "visible" %} selected{% endif %}>ظاهر</option>
       <option value="hidden"{% if status == "hidden" %} selected{% endif %}>مخفي</option>
       <option value="featured"{% if status == "featured" %} selected{% endif %}>مميّز</option>
+      <option value="home"{% if status == "home" %} selected{% endif %}>في الواجهة</option>
       <option value="nophotos"{% if status == "nophotos" %} selected{% endif %}>بلا صور</option>
     </select>
   </div>
@@ -33,7 +34,7 @@
     <form method="post" action="/dashboard/products/{{ p.id }}/visible/" data-toggle>{% csrf_token %}<button class="eye" title="{% if p.is_visible %}إخفاء من الموقع{% else %}إظهار في الموقع{% endif %}">{% if p.is_visible %}{% icon "eye" %}{% else %}{% icon "eyeoff" %}{% endif %}</button></form>
     <a href="/dashboard/products/{{ p.id }}/">
       <div class="ph">{% if cover %}<img src="{{ cover.thumb.url }}" alt="" loading="lazy" width="{{ cover.width }}" height="{{ cover.height }}">{% else %}{% icon "photo" %}{% endif %}
-        <div class="badges">{% if not p.is_visible %}<span class="badge">مخفي</span>{% endif %}{% if p.is_featured %}<span class="badge cp">مميّز</span>{% endif %}{% if not cover %}<span class="badge" style="background:var(--warn)">بلا صور</span>{% endif %}</div>
+        <div class="badges">{% if not p.is_visible %}<span class="badge">مخفي</span>{% endif %}{% if p.is_featured %}<span class="badge cp">مميّز</span>{% endif %}{% if p.on_home %}<span class="badge cp">في الواجهة</span>{% endif %}{% if not cover %}<span class="badge" style="background:var(--warn)">بلا صور</span>{% endif %}</div>
       </div>
       <div class="tx"><div class="tag">{{ p.brand.name_ar }}</div><h3>{{ p.name_ar }}</h3><div class="meta">{{ p.category.name_ar|default:"بلا فئة" }}{% if p.size %} · <bdi>{{ p.size }}</bdi>{% endif %}</div></div>
     </a>

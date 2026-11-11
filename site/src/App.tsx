@@ -5,6 +5,7 @@ import { GRID_X, GRID_Y, HUBS, MAP_H, MAP_W, OUTLINE_POINTS, ROUTE } from './lib
 import { LangList, LangMenu } from './components/LangMenu'
 import { PartnerForm } from './components/PartnerForm'
 import { ProductsPage } from './components/Products'
+import { HeroArch, Partners } from './components/Home'
 import { EMAIL, FACEBOOK, PHONE_SHOW, PHONE_TEL, whatsapp } from './lib/contact'
 import { Arrow, Dune, Html } from './components/ui'
 import { initMotion, lenisStop, lenisStart } from './motion'
@@ -105,9 +106,7 @@ export default function App({ lang, dict, page = 'home' }: { lang: Lang; dict: D
                 <a href="#partner" className="btn ghost">{t('hero.cta2')}</a>
               </div>
             </div>
-            <div data-in className="archwrap">
-              <div className="arch" id="arch"><img src="/img/bottle-rock.jpg" alt={t('alt.hero')} id="archimg" width={1800} height={1350} fetchPriority="high" /></div>
-            </div>
+            <HeroArch lang={lang} t={t} />
           </div>
         </section>
 
@@ -195,6 +194,8 @@ export default function App({ lang, dict, page = 'home' }: { lang: Lang; dict: D
             </div>
           </div>
         </section>
+
+        <Partners lang={lang} t={t} />
 
         <section id="network" style={{ paddingTop: 0 }}>
           <div className="wrap map-grid">

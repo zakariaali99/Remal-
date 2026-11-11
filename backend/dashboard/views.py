@@ -1,4 +1,4 @@
-"""REMAL dashboard: brands, categories, products with their photos, and partnership enquiries.
+"""REMAL dashboard: brands, categories, products with their photos, partners, and partnership enquiries.
 
 Plain Django views and templates. Every record is reached by its UUID id.
 """
@@ -19,10 +19,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from catalog.models import Brand, Category, Product, ProductImage
+from catalog.models import Brand, Category, Partner, Product, ProductImage
 from inquiries.models import Inquiry
 
-from .forms import BrandForm, CategoryForm, InquiryForm, ProductForm
+from .forms import BrandForm, CategoryForm, InquiryForm, PartnerForm, ProductForm
 
 
 def staff(view):
@@ -80,24 +80,27 @@ def home(request):
     })
 
 
-# ---------------------------------------------------------------- brands and categories
+# ---------------------------------------------------------------- brands, categories and partners
 
-ORDERED = {
-    "brands": (Brand, BrandForm, "علامة", "العلامات"),
-    "categories": (Category, CategoryForm, "فئة", "الفئات"),
+ORDERED = {  # model, form, singular, plural, feminine (for «جديدة» / «جديد»)
+    "brands": (Brand, BrandForm, "علامة", "العلامات", True),
+    "categories": (Category, CategoryForm, "فئة", "الفئات", True),
+    "partners": (Partner, PartnerForm, "شريك", "الشركاء", False),
 }
 
 
 @staff
 def group_list(request, kind):
     model = ORDERED[kind][0]
-    items = model.objects.annotate(n=Count("products")).order_by("order", "-created_at")
+    items = model.objects.order_by("order", "-created_at")
+    if kind != "partners":
+        items = items.annotate(n=Count("products"))
     return render(request, f"dashboard/{kind}.html", {"items": items, "kind": kind})
 
 
 @staff
 def group_edit(request, kind, pk=None):
-    model, form_class, singular, plural = ORDERED[kind]
+    model, form_class, singular, plural, fem = ORDERED[kind]
     obj = get_object_or_404(model, pk=pk) if pk else model(order=next_order(model))
     form = form_class(request.POST or None, request.FILES or None, instance=obj)
     if request.method == "POST":
@@ -111,7 +114,7 @@ def group_edit(request, kind, pk=None):
                 return redirect(f"/dashboard/{kind}/")
         messages.error(request, "راجع الحقول المعلّمة بالأحمر.")
     return render(request, "dashboard/group_form.html", {
-        "form": form, "obj": obj, "kind": kind, "singular": singular, "plural": plural, "is_new": pk is None,
+        "form": form, "obj": obj, "kind": kind, "singular": singular, "plural": plural, "fem": fem, "is_new": pk is None,
     })
 
 
@@ -152,6 +155,7 @@ STATUS_FILTERS = {
     "visible": Q(is_visible=True),
     "hidden": Q(is_visible=False),
     "featured": Q(is_featured=True),
+    "home": Q(on_home=True),
     "nophotos": Q(images__isnull=True),
 }
 

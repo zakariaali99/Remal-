@@ -1,7 +1,7 @@
 """Public, read-only JSON. Each request asks for one language (?lang=ar|en|fr|zh|ja)."""
 from rest_framework import serializers
 
-from .models import LANGS, Brand, Category, Product, ProductImage, localized
+from .models import LANGS, Brand, Category, Partner, Product, ProductImage, localized
 
 
 def request_lang(context) -> str:
@@ -107,3 +107,18 @@ class ProductDetailSerializer(ProductListSerializer):
 
     def get_description(self, obj):
         return self.tr(obj, "description")
+
+
+class PartnerSerializer(LocalizedSerializer):
+    name = serializers.SerializerMethodField()
+    logo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Partner
+        fields = ("id", "name", "logo", "website")
+
+    def get_name(self, obj):
+        return self.tr(obj, "name")
+
+    def get_logo(self, obj):
+        return self.media_url(obj.logo)

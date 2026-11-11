@@ -1,0 +1,28 @@
+{% extends "dashboard/base.html" %}{% load dash %}
+{% block title %}الشركاء{% endblock %}{% block mtitle %}الشركاء{% endblock %}
+{% block body %}
+<div class="top">
+  <div><h1>الشركاء</h1><div class="sub">يظهرون في الصفحة الرئيسية: الشعار وتحته الاسم، ورابط لموقعهم إن وُجد.</div></div>
+  <div class="grow"></div>
+  <a class="btn pri" href="/dashboard/partners/new/">{% icon "plus" %} شريك جديد</a>
+</div>
+{% if items %}
+<div class="card" style="overflow:hidden">
+  <ul class="rows" data-sortable="/dashboard/partners/order/">
+    {% for p in items %}
+    <li data-id="{{ p.id }}">
+      <span class="grip" title="اسحب لتغيير الترتيب">{% icon "grip" %}</span>
+      <span class="lg">{% if p.logo %}<img src="{{ p.logo.url }}" alt="">{% else %}{{ p.name_ar|slice:":1" }}{% endif %}</span>
+      <a class="who" href="/dashboard/partners/{{ p.id }}/"><b>{{ p.name_ar }} <bdi class="en">{{ p.name_en }}</bdi></b><span>{% if p.website %}<bdi class="en">{{ p.website }}</bdi>{% else %}بلا رابط{% endif %}</span></a>
+      {% if p.is_visible %}<span class="pill ok">ظاهر</span>{% else %}<span class="pill">مخفي</span>{% endif %}
+      <a class="iconbtn" href="/dashboard/partners/{{ p.id }}/" title="تعديل">{% icon "edit" %}</a>
+      <form method="post" action="/dashboard/partners/{{ p.id }}/delete/" data-confirm="حذف {{ p.name_ar }} نهائياً؟ لا يمكن التراجع.">{% csrf_token %}<button class="iconbtn del" title="حذف">{% icon "trash" %}</button></form>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% if items|length > 1 %}<p class="hint-row">{% icon "grip" %} الترتيب هنا هو ترتيب الشركاء في الموقع. اسحب لتغييره.</p>{% endif %}
+{% else %}
+<div class="card empty"><span class="ic">{% icon "partner" %}</span><b>لا شركاء بعد</b><span>أضف شعار الشريك واسمه ورابط موقعه، فيظهر في الصفحة الرئيسية.</span><a class="btn pri" href="/dashboard/partners/new/">{% icon "plus" %} شريك جديد</a></div>
+{% endif %}
+{% endblock %}

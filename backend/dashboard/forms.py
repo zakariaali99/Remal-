@@ -1,7 +1,7 @@
 from django import forms
 
 from catalog.images import max_upload_size
-from catalog.models import IMAGE_TYPES, LANGS, Brand, Category, Product
+from catalog.models import IMAGE_TYPES, LANGS, Brand, Category, Partner, Product
 from inquiries.models import Inquiry
 
 LANG_TABS = (
@@ -58,6 +58,15 @@ class CategoryForm(LangForm):
         fields = ["is_visible", *text_fields("name")]
 
 
+class PartnerForm(LangForm):
+    lang_fields = ("name",)
+
+    class Meta:
+        model = Partner
+        fields = ["logo", "website", "is_visible", *text_fields("name")]
+        widgets = {"website": forms.URLInput(attrs={"dir": "ltr", "placeholder": "https://"})}
+
+
 class MultipleImageInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
@@ -78,7 +87,7 @@ class ProductForm(LangForm):
 
     class Meta:
         model = Product
-        fields = ["brand", "category", "size", "sku", "is_visible", "is_featured", *text_fields("name", "family", "description")]
+        fields = ["brand", "category", "size", "sku", "is_visible", "is_featured", "on_home", *text_fields("name", "family", "description")]
         widgets = {
             "brand": forms.RadioSelect,
             "category": forms.RadioSelect,

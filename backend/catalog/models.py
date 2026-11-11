@@ -1,4 +1,4 @@
-"""Catalogue: brands, categories, products and their photos.
+"""Catalogue: brands, categories, products and their photos, and the partners shown on the home page.
 
 Every record is identified by a UUID `id`; the API and the dashboard never look anything up by name or slug.
 Text fields come in the site's five languages. Arabic and English are required; French, Chinese and
@@ -107,6 +107,7 @@ class Product(Ordered):
     size = models.CharField("الحجم", max_length=40, blank=True, help_text="مثال: 100 مل")
     sku = models.CharField("رمز الصنف", max_length=60, blank=True)
     is_featured = models.BooleanField("مميّز", default=False, help_text="يظهر أولاً في المعرض.")
+    on_home = models.BooleanField("في الواجهة", default=False, help_text="صورته الأولى تتبدّل في قوس الصفحة الرئيسية.")
 
     class Meta(Ordered.Meta):
         verbose_name = "منتج"
@@ -119,6 +120,30 @@ class Product(Ordered):
     @property
     def cover(self):
         return self.images.first()
+
+
+class Partner(Ordered):
+    """A partner shown on the home page: a logo with the name under it, linked to its website when there is one."""
+
+    name_ar = models.CharField("الاسم (عربي)", max_length=120)
+    name_en = models.CharField("الاسم (إنجليزي)", max_length=120)
+    name_fr = models.CharField("الاسم (فرنسي)", max_length=120, blank=True)
+    name_zh = models.CharField("الاسم (صيني)", max_length=120, blank=True)
+    name_ja = models.CharField("الاسم (ياباني)", max_length=120, blank=True)
+    logo = models.ImageField("الشعار", upload_to="partners/", blank=True, validators=[IMAGE_TYPES, max_upload_size])
+    website = models.URLField("الموقع", blank=True)
+
+    class Meta(Ordered.Meta):
+        verbose_name = "شريك"
+        verbose_name_plural = "الشركاء"
+
+    def __str__(self):
+        return self.name_ar
+
+    def save(self, *args, **kwargs):
+        if is_new_upload(self.logo):
+            self.logo = to_webp(self.logo, f"{self.id}", max_side=800)
+        super().save(*args, **kwargs)
 
 
 class ProductImage(models.Model):

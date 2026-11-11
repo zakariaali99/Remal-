@@ -6,10 +6,12 @@ static site from `~/public_html`; Django answers only the paths below.
 
 | Path | What |
 |---|---|
-| `/dashboard/` | The REMAL dashboard (Arabic): brands, categories, products and their photos, partnership enquiries |
+| `/dashboard/` | The REMAL dashboard (Arabic): brands, categories, products and their photos, partners, partnership enquiries |
 | `GET /api/products/?lang=&brand=<id>&category=<id>&page=` | Visible products, 24 per page |
+| `GET /api/products/?lang=&home=1` | The products chosen «في الواجهة», shown one after another in the home page arch |
 | `GET /api/products/<id>/?lang=` | One product with all its photos |
 | `GET /api/brands/?lang=` · `GET /api/categories/?lang=` | Filters for the gallery |
+| `GET /api/partners/?lang=` | Partners for the home page: logo, name and website |
 | `POST /api/contact/` | The partnership form (saved to the dashboard, then emailed to `CONTACT_TO` through the server's own mail system) |
 | `GET /api/sitemap.xml` | Product pages, linked from the site's `robots.txt` |
 
@@ -19,7 +21,7 @@ Uploaded photos are decoded, resized and re-encoded as WebP (a 2000px image and 
 also shrinks large phone photos in the browser before uploading them.
 
 ## Code
-- `catalog/`: brands, categories, products, photos, and the public `/api/` views.
+- `catalog/`: brands, categories, products, photos, partners, and the public `/api/` views.
 - `inquiries/`: the partnership form endpoint and its records.
 - `dashboard/`: the dashboard. Plain Django views and templates, one stylesheet (`static/dashboard/dash.css`) and one
   small script (`static/dashboard/dash.js`) for tabs, the live preview, photo upload and drag-to-reorder. Every page works without the script.

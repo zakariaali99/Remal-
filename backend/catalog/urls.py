@@ -7,5 +7,6 @@ urlpatterns = [
     path("products/<uuid:pk>/", views.ProductDetail.as_view()),
     path("brands/", views.BrandList.as_view()),
     path("categories/", views.CategoryList.as_view()),
+    path("partners/", views.PartnerList.as_view()),
     path("sitemap.xml", views.sitemap),
 ]

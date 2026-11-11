@@ -8,8 +8,10 @@ from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 
-from .models import Brand, Category, Product
-from .serializers import BrandSerializer, CategorySerializer, ProductDetailSerializer, ProductListSerializer
+from .models import Brand, Category, Partner, Product
+from .serializers import (
+    BrandSerializer, CategorySerializer, PartnerSerializer, ProductDetailSerializer, ProductListSerializer,
+)
 
 VISIBLE_PRODUCTS = Q(products__is_visible=True, products__brand__is_visible=True)
 
@@ -49,7 +51,7 @@ def visible_products():
 
 
 class ProductList(Cached, generics.ListAPIView):
-    """GET /api/products/?lang=&brand=<id>&category=<id>&page="""
+    """GET /api/products/?lang=&brand=<id>&category=<id>&home=1&page="""
 
     serializer_class = ProductListSerializer
     pagination_class = GalleryPage
@@ -60,6 +62,8 @@ class ProductList(Cached, generics.ListAPIView):
             qs = qs.filter(brand_id=brand)
         if category := uuid_param(self.request, "category"):
             qs = qs.filter(category_id=category)
+        if self.request.query_params.get("home") == "1":  # the home page arch: products with a photo, in their order
+            qs = qs.filter(on_home=True, images__isnull=False).distinct().order_by("order", "-created_at")
         return qs
 
 
@@ -92,6 +96,13 @@ class CategoryList(Cached, generics.ListAPIView):
             .filter(product_count__gt=0)
             .order_by("order", "-created_at")
         )
+
+
+class PartnerList(Cached, generics.ListAPIView):
+    """GET /api/partners/?lang="""
+
+    serializer_class = PartnerSerializer
+    queryset = Partner.objects.filter(is_visible=True)
 
 
 def sitemap(request):

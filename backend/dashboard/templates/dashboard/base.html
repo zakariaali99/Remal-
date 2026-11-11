@@ -16,6 +16,8 @@
       <a href="/dashboard/brands/"{% if "/dashboard/brands/" in s %} class="on" aria-current="page"{% endif %}>{% icon "brand" %}<span>العلامات</span></a>
       <a href="/dashboard/categories/"{% if "/dashboard/categories/" in s %} class="on" aria-current="page"{% endif %}>{% icon "cat" %}<span>الفئات</span></a>
       <a href="/dashboard/products/"{% if "/dashboard/products/" in s %} class="on" aria-current="page"{% endif %}>{% icon "prod" %}<span>المنتجات</span></a>
+      <div class="lbl">الموقع</div>
+      <a href="/dashboard/partners/"{% if "/dashboard/partners/" in s %} class="on" aria-current="page"{% endif %}>{% icon "partner" %}<span>الشركاء</span></a>
       <div class="lbl">التواصل</div>
       <a href="/dashboard/inquiries/"{% if "/dashboard/inquiries/" in s %} class="on" aria-current="page"{% endif %}>{% icon "inbox" %}<span>الطلبات</span>{% if nav_new %}<span class="c num">{{ nav_new }}</span>{% endif %}</a>
     </nav>
