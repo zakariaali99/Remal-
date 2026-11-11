@@ -31,6 +31,7 @@ export function HeroArch({ lang, t }: { lang: Lang; t: T }) {
   }, [slides, at, paused, hold])
 
   const current = at >= 0 ? slides[at] : null
+  const products = `${LANGS[lang].path}products/`
   return (
     <div data-in className="archwrap" onPointerEnter={() => setHold(true)} onPointerLeave={() => setHold(false)}
       onFocus={() => setHold(true)} onBlur={() => setHold(false)}>
@@ -42,10 +43,12 @@ export function HeroArch({ lang, t }: { lang: Lang; t: T }) {
               width={s.cover!.width} height={s.cover!.height} alt={i === at ? s.name : ''} className={i === at ? 'on' : ''} />
           ))}
         </div>
+        {/* the whole arch opens the product shown (the gallery for the bottle-on-rock photo); the caption below is the keyboard link */}
+        <a className="arch-link" href={current ? `${products}${current.id}/` : products} tabIndex={-1} aria-hidden="true" />
       </div>
       {slides.length > 0 && (
         <div className="arch-cap">
-          <a href={`${LANGS[lang].path}products/${(current ?? slides[0]).id}/`} aria-live={paused ? 'polite' : 'off'}>
+          <a href={`${products}${(current ?? slides[0]).id}/`} aria-live={paused ? 'polite' : 'off'}>
             <span className="tag">{(current ?? slides[0]).brand.name}</span>
             <b>{(current ?? slides[0]).name}</b>
           </a>
