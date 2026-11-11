@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { LANGS, type Key, type Lang } from '../i18n'
-import { get, type Page, type Partner, type ProductCard } from '../lib/api'
-import { Html } from './ui'
+import { get, type Brand, type Page, type Partner, type ProductCard } from '../lib/api'
+import { Arrow, Html } from './ui'
 
 type T = (k: Key) => string
 
@@ -91,5 +91,51 @@ export function Partners({ lang, t }: { lang: Lang; t: T }) {
         </ul>
       </div>
     </section>
+  )
+}
+
+// The portfolio: the visible brands from the dashboard in a row that scrolls sideways, each opening its products;
+// the last card invites new houses. Until the brands arrive (or when there are none) the static tiles stay.
+export function BrandSlider({ lang, t, children }: { lang: Lang; t: T; children: ReactNode }) {
+  const [brands, setBrands] = useState<Brand[]>([])
+  const track = useRef<HTMLUListElement>(null)
+  useEffect(() => { get<Brand[]>('/brands/', lang).then(setBrands).catch(() => {}) }, [lang])
+  if (!brands.length) return <>{children}</>
+  const move = (step: number) => {
+    const el = track.current!
+    const rtl = getComputedStyle(el).direction === 'rtl'
+    const room = el.scrollWidth - el.clientWidth // in RTL scrollLeft runs from 0 down to -room
+    const left = Math.min(rtl ? 0 : room, Math.max(rtl ? -room : 0, el.scrollLeft + step * (rtl ? -1 : 1) * el.clientWidth * 0.8))
+    el.scrollTo({ left, behavior: 'smooth' })
+  }
+  const home = LANGS[lang].path
+  return (
+    <div className="bslider">
+      <ul className="btrack" ref={track} data-lenis-prevent-horizontal>
+        {brands.map((b) => (
+          <li key={b.id}>
+            <a href={`${home}products/?brand=${b.id}`} className="bcard">
+              <span className="lg">{b.logo ? <img src={b.logo} alt="" loading="lazy" /> : <span aria-hidden="true">{b.name.slice(0, 1)}</span>}</span>
+              <span className="tx">
+                <b>{b.name}</b>
+                {b.tagline && <span className="tl">{b.tagline}</span>}
+                <span className="more">{t('pf.view')} <Arrow /></span>
+              </span>
+            </a>
+          </li>
+        ))}
+        <li>
+          <a href="#partner" className="bcard yours">
+            <span className="tag">{t('pf.yours')}</span>
+            <b>{t('pf.yoursh')}</b>
+            <span className="more">{t('pf.touch')}</span>
+          </a>
+        </li>
+      </ul>
+      <div className="bnav">
+        <button aria-label={t('pf.prev')} onClick={() => move(-1)}><Arrow /></button>
+        <button aria-label={t('pf.next')} onClick={() => move(1)}><Arrow /></button>
+      </div>
+    </div>
   )
 }

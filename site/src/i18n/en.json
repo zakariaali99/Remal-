@@ -178,5 +178,8 @@
  "hero.pause": "Pause the slides",
  "hero.play": "Play the slides",
  "ptn.eyebrow": "Our partners",
- "ptn.h2": "Partners we're <em>proud of.</em>"
+ "ptn.h2": "Partners we're <em>proud of.</em>",
+ "pf.view": "Its products",
+ "pf.prev": "Previous",
+ "pf.next": "Next"
 }

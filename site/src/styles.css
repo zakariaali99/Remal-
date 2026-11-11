@@ -297,6 +297,31 @@ footer{background:var(--ink);color:rgba(248,243,236,.7);padding:clamp(70px,9vw,1
 /* initial states only when JS animations will run */
 .js:not(.no-intro) .hero [data-in]{visibility:hidden}
 
+/* portfolio: brands from the dashboard */
+.btrack{list-style:none;display:grid;grid-auto-flow:column;grid-auto-columns:clamp(260px,31%,380px);gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.btrack::-webkit-scrollbar{display:none}
+.btrack li{scroll-snap-align:start}
+.bcard{display:flex;flex-direction:column;height:100%;background:var(--sand-2);transition:background .4s var(--ease)}
+.bcard:hover{background:var(--sand)}
+.bcard .lg{aspect-ratio:4/3;display:grid;place-items:center;padding:clamp(28px,4vw,48px)}
+.bcard .lg img{max-width:100%;max-height:100%;object-fit:contain;transition:transform 1.2s var(--ease)}
+.bcard:hover .lg img{transform:scale(1.04)}
+.bcard .lg span{font-family:var(--head);font-size:64px;color:var(--copper)}
+.bcard .tx{display:flex;flex-direction:column;gap:8px;padding:0 30px 30px;margin-top:auto}
+.bcard b{font-family:var(--head);font-weight:400;font-size:26px}
+.bcard .tl{color:var(--muted);font-size:15px}
+.bcard .more{margin-top:10px;font-family:var(--label);font-size:calc(var(--label-size) - 1px);letter-spacing:calc(var(--track)*.7);text-transform:uppercase;color:var(--copper)}
+html[dir=rtl] .bcard .more .ar{display:inline-block;transform:scaleX(-1)}
+.bcard.yours{background:transparent;border:1px dashed rgba(155,106,79,.45);padding:30px;justify-content:flex-end;gap:18px}
+.bcard.yours .tag{font-family:var(--label);font-size:calc(var(--label-size) - 2px);letter-spacing:var(--track);text-transform:uppercase;color:var(--muted)}
+.bcard.yours b{font-size:clamp(26px,2.4vw,34px)}
+.bnav{display:flex;gap:10px;margin-top:26px;justify-content:flex-end}
+.bnav button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--ink);cursor:pointer;display:grid;place-items:center;transition:background .3s,color .3s,border-color .3s}
+.bnav button:hover{background:var(--ink);color:var(--ivory);border-color:var(--ink)}
+.bnav button:first-child .ar{display:inline-block;transform:scaleX(-1)}
+html[dir=rtl] .bnav button:first-child .ar{transform:none}
+html[dir=rtl] .bnav button:last-child .ar{display:inline-block;transform:scaleX(-1)}
+
 /* partners (from the dashboard) */
 .partners{padding-top:0}
 .partners h2{margin-top:22px}
@@ -330,6 +355,7 @@ footer{background:var(--ink);color:rgba(248,243,236,.7);padding:clamp(70px,9vw,1
   .facts b{font-size:34px}
   .pf{grid-template-columns:1fr}.tile{min-height:220px}
   .plogos{grid-template-columns:1fr 1fr;gap:16px;margin-top:40px}
+  .btrack{grid-auto-columns:78%;gap:14px}
   form{grid-template-columns:1fr}
   .ft-top{grid-template-columns:1fr}
   .hero .ctas .btn{width:100%;justify-content:space-between}

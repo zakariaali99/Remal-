@@ -5,7 +5,7 @@ import { GRID_X, GRID_Y, HUBS, MAP_H, MAP_W, OUTLINE_POINTS, ROUTE } from './lib
 import { LangList, LangMenu } from './components/LangMenu'
 import { PartnerForm } from './components/PartnerForm'
 import { ProductsPage } from './components/Products'
-import { HeroArch, Partners } from './components/Home'
+import { BrandSlider, HeroArch, Partners } from './components/Home'
 import { EMAIL, FACEBOOK, PHONE_SHOW, PHONE_TEL, whatsapp } from './lib/contact'
 import { Arrow, Dune, Html } from './components/ui'
 import { initMotion, lenisStop, lenisStart } from './motion'
@@ -175,23 +175,25 @@ export default function App({ lang, dict, page = 'home' }: { lang: Lang; dict: D
               <div><div className="eyebrow" data-rv>{t('pf.eyebrow')}</div><Html as="h2" data-split html={t('pf.h2')} /></div>
               <a href={to('products/')} className="link" data-rv>{t('pf.browse')}</a>
             </div>
-            <div className="pf">
-              <div className="tile big" data-clip>
-                <img src="/img/bottle-rock.jpg" alt="" loading="lazy" width={1800} height={1350} />
-                <div className="cap"><div className="tag">{t('pf.soon')}</div><h3>{t('pf.soonh')}</h3></div>
-              </div>
-              <div className="tile brandtile" data-rv>
-                <div className="tag">{t('pf.partner')}</div>
-                <div>
-                  <h3 lang="ar" dir="rtl">الماجد للعود</h3>
-                  <div className="latin" lang="en" dir="ltr">Almajed for Oud</div>
+            <BrandSlider lang={lang} t={t}>
+              <div className="pf">
+                <div className="tile big" data-clip>
+                  <img src="/img/bottle-rock.jpg" alt="" loading="lazy" width={1800} height={1350} />
+                  <div className="cap"><div className="tag">{t('pf.soon')}</div><h3>{t('pf.soonh')}</h3></div>
                 </div>
-                <div className="more">{t('pf.majed.meta')}</div>
+                <div className="tile brandtile" data-rv>
+                  <div className="tag">{t('pf.partner')}</div>
+                  <div>
+                    <h3 lang="ar" dir="rtl">الماجد للعود</h3>
+                    <div className="latin" lang="en" dir="ltr">Almajed for Oud</div>
+                  </div>
+                  <div className="more">{t('pf.majed.meta')}</div>
+                </div>
+                <a href="#partner" className="tile soon" data-rv>
+                  <div className="tag">{t('pf.yours')}</div><h3>{t('pf.yoursh')}</h3><div className="more">{t('pf.touch')}</div>
+                </a>
               </div>
-              <a href="#partner" className="tile soon" data-rv>
-                <div className="tag">{t('pf.yours')}</div><h3>{t('pf.yoursh')}</h3><div className="more">{t('pf.touch')}</div>
-              </a>
-            </div>
+            </BrandSlider>
           </div>
         </section>
 
